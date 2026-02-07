@@ -11,6 +11,7 @@ dependencies = [
     "matplotlib>=3.9.4",
     "mlforecast>=1.0.2",
     "openpyxl>=3.1.5",
+    "optuna>=4.7.0",
     "pandas>=2.3.3",
     "python-dotenv>=1.2.1",
     "pytz>=2025.2",

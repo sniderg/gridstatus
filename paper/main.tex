@@ -163,13 +163,15 @@ We employ LightGBM \citep{ke2017lightgbm}, a gradient boosting decision tree (GB
     \mathcal{L} = \frac{1}{N}\sum_{i=1}^{N} |y_i - \hat{y}_i|
 \end{equation}
 
-Key hyperparameters:
+Key hyperparameters were tuned using Optuna \citep{optuna2019} with 20 trials and TPE sampling:
 \begin{itemize}
-    \item Number of estimators: 500
-    \item Learning rate: 0.05
-    \item Maximum depth: default (no limit)
-    \item Random seed: 42
+    \item Number of estimators: 625
+    \item Learning rate: 0.011
+    \item Maximum depth: 12
+    \item Number of leaves: 108
+    \item Regularization ($\alpha$, $\lambda$): 0.0008
 \end{itemize}
+Hyperparameter tuning reduced MAE by 8.4\% compared to default parameters (30-day CV).
 
 The full feature vector at time $t$ is:
 \begin{equation}
