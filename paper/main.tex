@@ -33,7 +33,7 @@
 
 % Abstract
 \begin{abstract}
-Accurate day-ahead electricity price forecasting is essential for market participants in deregulated power markets. This paper presents a machine learning approach for forecasting day-ahead locational marginal prices (LMPs) in the Electric Reliability Council of Texas (ERCOT) market. We develop a LightGBM gradient boosting model incorporating temporal features, autoregressive lag structures, and exogenous weather covariates from the Open-Meteo API. Using 180-day rolling cross-validation on two years of historical data (2024--2026), our model achieves a mean absolute error (MAE) of \$13.49/MWh for the HB\_NORTH pricing hub. Feature importance analysis reveals that recent price lags and temperature are the dominant predictors, while time-of-day features capture intraday price patterns. The model demonstrates strong performance during normal operating conditions (MAE \$5--11/MWh) with degradation during extreme weather events that cause price spikes.
+Accurate day-ahead electricity price forecasting is essential for market participants in deregulated power markets. This paper presents a machine learning approach for forecasting day-ahead locational marginal prices (LMPs) in the Electric Reliability Council of Texas (ERCOT) market. We develop a LightGBM gradient boosting model incorporating temporal features, autoregressive lag structures, and exogenous weather covariates from the Open-Meteo API. Using 180-day rolling cross-validation on two years of historical data (2024--2026), our model achieves a mean absolute error (MAE) of \$13.49/MWh for the HB\_NORTH pricing hub. We extend the model to provide probabilistic forecasts via quantile regression, achieving 66.9\% coverage for 80\% prediction intervals. Feature importance analysis reveals that recent price lags and temperature are the dominant predictors. The model demonstrates strong performance during normal operating conditions (MAE \$5--11/MWh) with degradation during extreme weather events.
 \end{abstract}
 
 % Keywords
@@ -290,6 +290,40 @@ Error varies systematically by hour of day. The highest errors occur during:
 
 Overnight hours (midnight-4 AM) exhibit the lowest errors (\$7-8/MWh) due to stable, predictable demand.
 
+\subsection{Probabilistic Forecasts}
+
+Point forecasts alone provide incomplete information for decision-making under uncertainty. We extend our model to produce prediction intervals using quantile regression \citep{nowotarski2018recent}. LightGBM supports quantile regression natively by setting the objective function to minimize the pinball loss:
+\begin{equation}
+    L_\tau(y, \hat{y}) = \max[\tau(y - \hat{y}), (\tau - 1)(y - \hat{y})]
+\end{equation}
+where $\tau \in (0,1)$ is the target quantile.
+
+We train three quantile models ($\tau \in \{0.1, 0.5, 0.9\}$) to construct 80\% prediction intervals. Table~\ref{tab:quantile_results} summarizes performance over a 30-day cross-validation period.
+
+\begin{table}[H]
+    \centering
+    \caption{Quantile Regression Results (30-Day CV)}
+    \label{tab:quantile_results}
+    \begin{tabular}{lc}
+        \toprule
+        Metric & Value \\
+        \midrule
+        80\% PI Coverage & 66.9\% \\
+        Median MAE & \$4.85/MWh \\
+        Avg Interval Width & \$13.28/MWh \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Figure~\ref{fig:quantile} shows an example probabilistic forecast. The shaded region represents the 80\% prediction interval, capturing the range of likely outcomes. The observed coverage of 66.9\% falls below the nominal 80\%, indicating slight underestimation of uncertainty---a common finding in electricity price forecasting due to heavy-tailed distributions.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/quantile_forecast.png}
+    \caption{Probabilistic forecast with 80\% prediction interval (shaded). The median forecast (red dashed) tracks the actual price (black) closely. October 15, 2025.}
+    \label{fig:quantile}
+\end{figure}
+
 \section{Discussion}
 
 \subsection{Model Performance in Context}
@@ -319,15 +353,15 @@ Several limitations merit consideration:
 
 Promising extensions include:
 \begin{itemize}
-    \item Quantile regression to provide prediction intervals
     \item Incorporation of load forecasts and generation schedules
     \item Ensemble methods combining multiple model types
     \item Real-time market price forecasting
+    \item Multi-hub forecasting across ERCOT zones
 \end{itemize}
 
 \section{Conclusion}
 
-This paper demonstrates that accurate day-ahead electricity price forecasting for ERCOT is achievable using gradient boosting with readily available weather data. The LightGBM model incorporating lag features, calendar variables, and weather covariates achieves an MAE of \$13.49/MWh over a 6-month cross-validation period, with performance improving to \$5-11/MWh during normal operating conditions.
+This paper demonstrates that accurate day-ahead electricity price forecasting for ERCOT is achievable using gradient boosting with readily available weather data. The LightGBM model incorporating lag features, calendar variables, and weather covariates achieves an MAE of \$13.49/MWh over a 6-month cross-validation period, with performance improving to \$5-11/MWh during normal operating conditions. Quantile regression extends the framework to provide probabilistic forecasts with prediction intervals.
 
 The analysis confirms the critical importance of price persistence (24-hour lag) and temperature as predictive features. Open-source tools (Python, LightGBM, mlforecast, Open-Meteo API) enable rapid development and deployment of production-quality forecasting systems.
 

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.3.8)  6 FEB 2026 19:44
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.3.8)  6 FEB 2026 19:59
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -551,7 +551,7 @@ Underfull \hbox (badness 1303) in paragraph at lines 68--69
 \T1/cmr/m/n/10.95 which rep-re-sents the weighted av-er-age price
  []
 
-<figures/texas_ercot_map.png, id=139, 642.4pt x 642.4pt>
+<figures/texas_ercot_map.png, id=143, 642.4pt x 642.4pt>
 File: figures/texas_ercot_map.png Graphic file (type png)
 <use figures/texas_ercot_map.png>
 Package pdftex.def Info: figures/texas_ercot_map.png  used on input line 72.
@@ -561,11 +561,6 @@ Package pdftex.def Info: figures/texas_ercot_map.png  used on input line 72.
 
 
 [2 <./figures/texas_ercot_map.png>]
-Overfull \hbox (35.70563pt too wide) detected at line 139
-[]
- []
-
-
 
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
 put line 184.
@@ -577,15 +572,6 @@ Underfull \hbox (badness 1314) in paragraph at lines 198--199
 
 
 [3]
-
-LaTeX Warning: Reference `fig:monthly' on page 4 undefined on input line 232.
-
-
-Underfull \hbox (badness 1448) in paragraph at lines 232--233
-\T1/cmr/m/n/10.95 ber, Oc-to-ber) and de-grades dur-ing ex-treme
- []
-
-
 Underfull \hbox (badness 2990) in paragraph at lines 252--253
 []\T1/cmr/m/n/10.95 The el-e-vated Jan-uary 2026 MAE is at-
  []
@@ -595,7 +581,7 @@ Underfull \hbox (badness 2359) in paragraph at lines 252--253
 \T1/cmr/m/n/10.95 caused de-mand spikes and as-so-ci-ated price
  []
 
-<figures/example_day_forecast.png, id=183, 715.473pt x 281.853pt>
+<figures/example_day_forecast.png, id=188, 715.473pt x 281.853pt>
 File: figures/example_day_forecast.png Graphic file (type png)
 <use figures/example_day_forecast.png>
 Package pdftex.def Info: figures/example_day_forecast.png  used on input line 2
@@ -603,16 +589,12 @@ Package pdftex.def Info: figures/example_day_forecast.png  used on input line 2
 (pdftex.def)             Requested size: 229.8775pt x 90.55606pt.
 
 
-<figures/feature_importance.png, id=186, 570.933pt x 426.393pt>
+<figures/feature_importance.png, id=191, 570.933pt x 426.393pt>
 File: figures/feature_importance.png Graphic file (type png)
 <use figures/feature_importance.png>
 Package pdftex.def Info: figures/feature_importance.png  used on input line 278
 .
 (pdftex.def)             Requested size: 229.8775pt x 171.67975pt.
-
-LaTeX Warning: Reference `fig:hourly_error' on page 4 undefined on input line 2
-85.
-
 
 
 [4 <./figures/example_day_forecast.png> <./figures/feature_importance.png>]
@@ -622,19 +604,33 @@ n/10.95 ^^Y$
  []
 
 
-Underfull \hbox (badness 2564) in paragraph at lines 314--315
+Underfull \hbox (badness 5741) in paragraph at lines 301--302
+[]\T1/cmr/m/n/10.95 We train three quan-tile mod-els ($\OML/cmm/m/it/10.95 ^^\ 
+\OMS/cmsy/m/n/10.95 2
+ []
+
+<figures/quantile_forecast.png, id=210, 715.2321pt x 353.8821pt>
+File: figures/quantile_forecast.png Graphic file (type png)
+<use figures/quantile_forecast.png>
+Package pdftex.def Info: figures/quantile_forecast.png  used on input line 322.
+
+(pdftex.def)             Requested size: 229.8775pt x 113.73595pt.
+
+
+
+
+[5 <./figures/quantile_forecast.png>]
+Underfull \hbox (badness 2564) in paragraph at lines 348--349
 \T1/cmr/m/n/10.95 grades sig-nif-i-cantly dur-ing price spikes,
  []
 
 
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 324--325
+Underfull \hbox (badness 10000) in paragraph at lines 357--358
 []\T1/cmr/m/n/10.95 Ensemble meth-ods com-bin-ing mul-ti-ple
  []
 
 
-Underfull \hbox (badness 1087) in paragraph at lines 330--331
+Underfull \hbox (badness 1087) in paragraph at lines 364--365
 \T1/cmr/m/n/10.95 This pa-per demon-strates that ac-cu-rate day-
  []
 
@@ -655,37 +651,29 @@ Underfull \hbox (badness 10000) in paragraph at lines 9--14
 
 
 
-[5])
-Underfull \hbox (badness 10000) in paragraph at lines 349--350
+)
+Underfull \hbox (badness 10000) in paragraph at lines 383--384
 []\T1/cmr/m/n/10.95 Weather data: Open-Meteo His-tor-i-cal
  []
 
 
 
-
-
-[6
-
-] (./main.aux)
+[6] (./main.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
  ***********
-
-
-LaTeX Warning: There were undefined references.
-
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 5ACF21868036750801CB55EFA0EB13F1;3938.
+(rerunfilecheck)             Checksum: B3BF54139C7EE4DD936A1B48C807F5BF;4114.
  ) 
 Here is how much of TeX's memory you used:
- 13533 strings out of 474662
- 210650 string characters out of 5751110
- 624198 words of memory out of 5000000
- 36331 multiletter control sequences out of 15000+600000
+ 13551 strings out of 474662
+ 211145 string characters out of 5751110
+ 625487 words of memory out of 5000000
+ 36344 multiletter control sequences out of 15000+600000
  576077 words of font info for 78 fonts, out of 8000000 for 9000
  319 hyphenation exceptions out of 8191
- 75i,10n,79p,991b,550s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,10n,79p,1044b,528s stack positions out of 10000i,1000n,20000p,200000b,200000s
  </Users/graydonsnider/Library/texlive/2025basic/texmf-var/fonts/pk/ljfour/jk
 nappen/ec/ecti1095.600pk> </Users/graydonsnider/Library/texlive/2025basic/texmf
 -var/fonts/pk/ljfour/jknappen/ec/ectt1095.600pk> </Users/graydonsnider/Library/
@@ -712,10 +700,10 @@ fb></usr/local/texlive/2025basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8
 .pfb></usr/local/texlive/2025basic/texmf-dist/fonts/type1/public/amsfonts/cm/cm
 sy10.pfb></usr/local/texlive/2025basic/texmf-dist/fonts/type1/public/amsfonts/c
 m/cmsy8.pfb>
-Output written on main.pdf (6 pages, 560038 bytes).
+Output written on main.pdf (6 pages, 802910 bytes).
 PDF statistics:
- 684 PDF objects out of 1000 (max. 8388607)
- 279 compressed objects within 3 object streams
- 68 named destinations out of 1000 (max. 500000)
- 232 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 704 PDF objects out of 1000 (max. 8388607)
+ 295 compressed objects within 3 object streams
+ 73 named destinations out of 1000 (max. 500000)
+ 245 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -1,4 +1,4 @@
-\begin{thebibliography}{5}
+\begin{thebibliography}{6}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -25,6 +25,13 @@ Jesus Lago, Grzegorz Marcjasz, Bart De~Schutter, and Rafal Weron.
 \newblock Forecasting day-ahead electricity prices: A review of
   state-of-the-art algorithms, best practices and an open-access benchmark.
 \newblock \emph{Applied Energy}, 293:\penalty0 116983, 2021.
+
+\bibitem[Nowotarski and Weron(2018)]{nowotarski2018recent}
+Jakub Nowotarski and Rafal Weron.
+\newblock Recent advances in electricity price forecasting: A review of
+  probabilistic forecasting.
+\newblock \emph{Renewable and Sustainable Energy Reviews}, 81:\penalty0
+  1548--1568, 2018.
 
 \bibitem[{Open-Meteo}(2024)]{openmeteo2024}
 {Open-Meteo}.
