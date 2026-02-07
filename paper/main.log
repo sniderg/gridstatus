@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.3.8)  6 FEB 2026 20:36
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.3.8)  6 FEB 2026 20:51
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -614,6 +614,11 @@ Underfull \hbox (badness 5741) in paragraph at lines 303--304
 
 
 
+
+Underfull \hbox (badness 1348) in paragraph at lines 320--321
+\T1/cmr/m/n/10.95 mized hy-per-pa-ram-e-ters im-prov-ing cal-i-bra-tion
+ []
+
 <figures/quantile_forecast.png, id=212, 715.2321pt x 353.8821pt>
 File: figures/quantile_forecast.png Graphic file (type png)
 <use figures/quantile_forecast.png>
@@ -715,7 +720,7 @@ fb></usr/local/texlive/2025basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8
 .pfb></usr/local/texlive/2025basic/texmf-dist/fonts/type1/public/amsfonts/cm/cm
 sy10.pfb></usr/local/texlive/2025basic/texmf-dist/fonts/type1/public/amsfonts/c
 m/cmsy8.pfb>
-Output written on main.pdf (7 pages, 813365 bytes).
+Output written on main.pdf (7 pages, 813310 bytes).
 PDF statistics:
  744 PDF objects out of 1000 (max. 8388607)
  307 compressed objects within 4 object streams

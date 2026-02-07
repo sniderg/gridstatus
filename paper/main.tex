@@ -33,7 +33,7 @@
 
 % Abstract
 \begin{abstract}
-Accurate day-ahead electricity price forecasting is essential for market participants in deregulated power markets. This paper presents a machine learning approach for forecasting day-ahead locational marginal prices (LMPs) in the Electric Reliability Council of Texas (ERCOT) market. We develop a LightGBM gradient boosting model incorporating temporal features, autoregressive lag structures, and exogenous weather covariates from the Open-Meteo API. Using 180-day rolling cross-validation on two years of historical data (2024--2026), our model achieves a mean absolute error (MAE) of \$13.49/MWh for the HB\_NORTH pricing hub. We extend the model to provide probabilistic forecasts via quantile regression, achieving 66.9\% coverage for 80\% prediction intervals. Feature importance analysis reveals that recent price lags and temperature are the dominant predictors. The model demonstrates strong performance during normal operating conditions (MAE \$5--11/MWh) with degradation during extreme weather events.
+Accurate day-ahead electricity price forecasting is essential for market participants in deregulated power markets. This paper presents a machine learning approach for forecasting day-ahead locational marginal prices (LMPs) in the Electric Reliability Council of Texas (ERCOT) market. We develop a LightGBM gradient boosting model incorporating temporal features, autoregressive lag structures, and exogenous weather covariates from the Open-Meteo API. Using 180-day rolling cross-validation on two years of historical data (2024--2026), our model achieves a mean absolute error (MAE) of \$13.49/MWh for the HB\_NORTH pricing hub. We extend the model to provide probabilistic forecasts via quantile regression, achieving 70.8\% coverage for 80\% prediction intervals. Feature importance analysis reveals that recent price lags and temperature are the dominant predictors. The model demonstrates strong performance during normal operating conditions (MAE \$5--11/MWh) with degradation during extreme weather events.
 \end{abstract}
 
 % Keywords
@@ -310,14 +310,14 @@ We train three quantile models ($\tau \in \{0.1, 0.5, 0.9\}$) to construct 80\% 
         \toprule
         Metric & Value \\
         \midrule
-        80\% PI Coverage & 66.9\% \\
-        Median MAE & \$4.85/MWh \\
-        Avg Interval Width & \$13.28/MWh \\
+        80\% PI Coverage & 70.8\% \\
+        Median MAE & \$4.58/MWh \\
+        Avg Interval Width & \$13.25/MWh \\
         \bottomrule
     \end{tabular}
 \end{table}
 
-Figure~\ref{fig:quantile} shows an example probabilistic forecast. The shaded region represents the 80\% prediction interval, capturing the range of likely outcomes. The observed coverage of 66.9\% falls below the nominal 80\%, indicating slight underestimation of uncertainty---a common finding in electricity price forecasting due to heavy-tailed distributions.
+Figure~\ref{fig:quantile} shows an example probabilistic forecast. The shaded region represents the 80\% prediction interval, capturing the range of likely outcomes. The observed coverage of 70.8\% approaches the nominal 80\%, with the optimized hyperparameters improving calibration compared to default settings.
 
 \begin{figure}[H]
     \centering
