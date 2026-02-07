@@ -1,0 +1,353 @@
+\documentclass[11pt,twocolumn]{article}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage[margin=1in]{geometry}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{xcolor}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{natbib}
+
+% Custom commands
+\newcommand{\maeval}{\text{MAE}}
+\newcommand{\rmse}{\text{RMSE}}
+
+% Title
+\title{Day-Ahead Electricity Price Forecasting for ERCOT Using Gradient Boosting with Weather Covariates}
+\author{Graydon Snider\\
+\small Department of Operations Research\\
+\small \texttt{graydon.snider@email.com}}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+% Abstract
+\begin{abstract}
+Accurate day-ahead electricity price forecasting is essential for market participants in deregulated power markets. This paper presents a machine learning approach for forecasting day-ahead locational marginal prices (LMPs) in the Electric Reliability Council of Texas (ERCOT) market. We develop a LightGBM gradient boosting model incorporating temporal features, autoregressive lag structures, and exogenous weather covariates from the Open-Meteo API. Using 180-day rolling cross-validation on two years of historical data (2024--2026), our model achieves a mean absolute error (MAE) of \$13.49/MWh for the HB\_NORTH pricing hub. Feature importance analysis reveals that recent price lags and temperature are the dominant predictors, while time-of-day features capture intraday price patterns. The model demonstrates strong performance during normal operating conditions (MAE \$5--11/MWh) with degradation during extreme weather events that cause price spikes.
+\end{abstract}
+
+% Keywords
+\noindent\textbf{Keywords:} Electricity price forecasting, ERCOT, LightGBM, machine learning, weather covariates, day-ahead market
+
+\section{Introduction}
+
+Electricity markets in deregulated environments exhibit complex price dynamics driven by supply-demand imbalances, fuel costs, transmission constraints, and weather conditions. The Electric Reliability Council of Texas (ERCOT) operates one of the largest competitive electricity markets in the United States, serving approximately 90\% of the state's electric load \citep{ercot2024}.
+
+Day-ahead price forecasting is critical for multiple market participants:
+\begin{itemize}
+    \item \textbf{Generators}: Optimize bidding strategies and commitment decisions
+    \item \textbf{Load-serving entities}: Hedge procurement costs and manage risk
+    \item \textbf{Traders}: Identify arbitrage opportunities between day-ahead and real-time markets
+    \item \textbf{Storage operators}: Optimize charge/discharge schedules
+\end{itemize}
+
+Traditional approaches to electricity price forecasting include time series models (ARIMA, SARIMA), regime-switching models, and fundamental supply-demand simulations \citep{weron2014electricity}. More recently, machine learning methods—particularly gradient boosting and deep learning—have demonstrated superior performance in capturing the nonlinear relationships inherent in electricity prices \citep{lago2021forecasting}.
+
+This paper contributes to the literature by:
+\begin{enumerate}
+    \item Developing an end-to-end forecasting pipeline for ERCOT day-ahead prices using open-source tools
+    \item Demonstrating the value of incorporating free weather API data as exogenous covariates
+    \item Providing extensive cross-validation analysis across different market conditions
+    \item Quantifying model performance by hour-of-day and month
+\end{enumerate}
+
+\section{Data}
+
+\subsection{Study Region}
+
+We focus on the HB\_NORTH pricing hub, which represents the weighted average price across settlement points in the Dallas-Fort Worth metropolitan area (Figure~\ref{fig:map}). This region accounts for significant load due to commercial and residential demand in one of the fastest-growing metropolitan areas in the United States.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/texas_ercot_map.png}
+    \caption{ERCOT electricity grid zones with HB\_NORTH highlighted (blue). Weather observations are collected from a station near Dallas (32.78°N, 96.80°W).}
+    \label{fig:map}
+\end{figure}
+
+\subsection{Price Data}
+
+Day-ahead settlement point prices (SPPs) were obtained from ERCOT's public data archives for the period January 2024 through January 2026, yielding approximately 18,300 hourly observations. Table~\ref{tab:price_stats} summarizes key statistics.
+
+\begin{table}[H]
+    \centering
+    \caption{Summary Statistics: HB\_NORTH Day-Ahead Prices}
+    \label{tab:price_stats}
+    \begin{tabular}{lr}
+        \toprule
+        Statistic & Value \\
+        \midrule
+        Observations & 18,286 \\
+        Mean & \$32.17/MWh \\
+        Median & \$24.50/MWh \\
+        Std. Deviation & \$58.43/MWh \\
+        Minimum & -\$31.00/MWh \\
+        Maximum & \$1,876.00/MWh \\
+        Skewness & 12.4 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+The price distribution exhibits heavy right-tail behavior characteristic of electricity markets, with extreme spikes during scarcity events. Negative prices occur during periods of high renewable generation and low demand.
+
+\subsection{Weather Data}
+
+Hourly weather observations were obtained from the Open-Meteo Historical Weather API \citep{openmeteo2024}, which provides free access to ERA5 reanalysis data. The following variables were collected for a location representative of the HB\_NORTH zone:
+
+\begin{itemize}
+    \item Temperature at 2m ($T$, °C)
+    \item Relative humidity (\%)
+    \item Wind speed at 10m (km/h)
+    \item Wind gusts at 10m (km/h)
+    \item Shortwave radiation (W/m²)
+    \item Cloud cover (\%)
+\end{itemize}
+
+Weather conditions directly influence electricity demand through heating/cooling loads and supply through renewable generation (wind and solar).
+
+\section{Methods}
+
+\subsection{Feature Engineering}
+\label{sec:features}
+
+Effective forecasting of electricity prices requires capturing multiple temporal patterns. We construct three categories of features:
+
+\subsubsection{Lag Features (Autoregressive)}
+
+Price persistence is a dominant characteristic of electricity markets. We include lagged values at horizons corresponding to:
+\begin{align}
+    y_{t-24} &: \text{Same hour yesterday} \\
+    y_{t-48} &: \text{Same hour 2 days ago} \\
+    y_{t-168} &: \text{Same hour last week}
+\end{align}
+
+\subsubsection{Rolling Statistics}
+
+To capture local trends and volatility, we compute:
+\begin{align}
+    \bar{y}_{t,24} &= \frac{1}{24}\sum_{i=1}^{24} y_{t-24-i} \quad \text{(24-hour rolling mean)} \\
+    \sigma_{t,24} &= \sqrt{\frac{1}{24}\sum_{i=1}^{24} (y_{t-24-i} - \bar{y}_{t,24})^2} \quad \text{(24-hour rolling std)}
+\end{align}
+
+\subsubsection{Calendar Features}
+
+Electricity demand follows strong intraday and weekly patterns:
+\begin{itemize}
+    \item Hour of day: $h \in \{0, 1, \ldots, 23\}$
+    \item Day of week: $d \in \{0, 1, \ldots, 6\}$
+    \item Month: $m \in \{1, 2, \ldots, 12\}$
+\end{itemize}
+
+\subsubsection{Weather Covariates}
+
+Weather features enter the model as exogenous regressors:
+\begin{equation}
+    \mathbf{x}_t^{\text{weather}} = [T_t, H_t, W_t, G_t, S_t, C_t]^\top
+\end{equation}
+where $T$ is temperature, $H$ is humidity, $W$ is wind speed, $G$ is wind gusts, $S$ is solar radiation, and $C$ is cloud cover.
+
+\subsection{Model Architecture}
+
+We employ LightGBM \citep{ke2017lightgbm}, a gradient boosting decision tree (GBDT) algorithm optimized for efficiency and accuracy. The model minimizes the mean absolute error loss:
+
+\begin{equation}
+    \mathcal{L} = \frac{1}{N}\sum_{i=1}^{N} |y_i - \hat{y}_i|
+\end{equation}
+
+Key hyperparameters:
+\begin{itemize}
+    \item Number of estimators: 500
+    \item Learning rate: 0.05
+    \item Maximum depth: default (no limit)
+    \item Random seed: 42
+\end{itemize}
+
+The full feature vector at time $t$ is:
+\begin{equation}
+    \mathbf{x}_t = [\mathbf{x}_t^{\text{lag}}, \mathbf{x}_t^{\text{rolling}}, \mathbf{x}_t^{\text{calendar}}, \mathbf{x}_t^{\text{weather}}]^\top
+\end{equation}
+
+\subsection{Recursive Multi-Step Forecasting}
+
+Day-ahead forecasts require predicting 24 hours simultaneously. We use a recursive (iterated) forecasting strategy:
+
+\begin{algorithm}[H]
+\caption{Recursive 24-Hour Ahead Forecast}
+\begin{algorithmic}[1]
+\Require Trained model $f$, history $\{y_t\}_{t \leq T}$, weather forecast $\{\mathbf{x}^{\text{weather}}_{T+h}\}_{h=1}^{24}$
+\For{$h = 1$ to $24$}
+    \State Construct $\mathbf{x}_{T+h}$ using available lags and features
+    \State $\hat{y}_{T+h} \leftarrow f(\mathbf{x}_{T+h})$
+    \State Update lag buffer with $\hat{y}_{T+h}$
+\EndFor
+\State \Return $\{\hat{y}_{T+h}\}_{h=1}^{24}$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Cross-Validation Strategy}
+
+We employ expanding-window cross-validation with 180 windows covering approximately 6 months:
+\begin{itemize}
+    \item Minimum training size: 2 weeks (336 hours)
+    \item Forecast horizon: 24 hours
+    \item Step size: 24 hours (non-overlapping)
+\end{itemize}
+
+This approach simulates realistic operational deployment where the model is retrained daily on all available historical data.
+
+\section{Results}
+
+\subsection{Cross-Validation Performance}
+
+Table~\ref{tab:cv_results} summarizes the cross-validation results across the 180-window backtest period.
+
+\begin{table}[H]
+    \centering
+    \caption{Cross-Validation Results (August 2025 -- January 2026)}
+    \label{tab:cv_results}
+    \begin{tabular}{lc}
+        \toprule
+        Metric & Value \\
+        \midrule
+        Overall MAE & \$13.49/MWh \\
+        Median Absolute Error & \$7.23/MWh \\
+        Best Month (Sep 2025) & \$5.22/MWh \\
+        Worst Month (Jan 2026) & \$36.85/MWh \\
+        Total Hours Evaluated & 4,320 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{Monthly Performance}
+
+Figure~\ref{fig:monthly} shows significant variation in forecast accuracy across months. Performance is strongest during mild shoulder seasons (September, October) and degrades during extreme weather periods.
+
+\begin{table}[H]
+    \centering
+    \caption{MAE by Month}
+    \label{tab:monthly}
+    \begin{tabular}{lc}
+        \toprule
+        Month & MAE (\$/MWh) \\
+        \midrule
+        August 2025 & 9.06 \\
+        September 2025 & 5.22 \\
+        October 2025 & 7.57 \\
+        November 2025 & 10.59 \\
+        December 2025 & 10.70 \\
+        January 2026 & 36.85 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+The elevated January 2026 MAE is attributable to extreme cold weather events that caused demand spikes and associated price volatility exceeding \$1,500/MWh.
+
+\subsection{Example Forecast}
+
+Figure~\ref{fig:example} illustrates a representative day-ahead forecast for October 15, 2025—a day with typical demand patterns. The model captures both the overnight trough and the evening peak, achieving an MAE of \$4.52 for this day.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/example_day_forecast.png}
+    \caption{Day-ahead price forecast for October 15, 2025. Black line shows actual prices; blue dashed line shows model predictions. MAE = \$4.52/MWh.}
+    \label{fig:example}
+\end{figure}
+
+\subsection{Feature Importance}
+
+Figure~\ref{fig:importance} displays the LightGBM feature importance scores (split count). Key findings:
+
+\begin{enumerate}
+    \item \textbf{Price (t-24h)} is the most important feature, confirming strong day-over-day persistence
+    \item \textbf{Temperature} ranks second, highlighting the importance of weather-driven demand
+    \item \textbf{Rolling statistics} capture recent market conditions
+    \item \textbf{Hour of day} has lower importance than expected, likely because intraday patterns are implicitly captured by the 24-hour lag
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/feature_importance.png}
+    \caption{LightGBM feature importance by split count. Lag features (green) dominate, followed by weather features (red) and calendar features (blue).}
+    \label{fig:importance}
+\end{figure}
+
+\subsection{Hourly Error Analysis}
+
+Error varies systematically by hour of day (Figure~\ref{fig:hourly_error}). The highest errors occur during:
+\begin{itemize}
+    \item \textbf{Morning ramp (6-8 AM)}: MAE $\approx$ \$18/MWh
+    \item \textbf{Evening peak (6-9 PM)}: MAE $\approx$ \$20-24/MWh
+\end{itemize}
+
+Overnight hours (midnight-4 AM) exhibit the lowest errors (\$7-8/MWh) due to stable, predictable demand.
+
+\section{Discussion}
+
+\subsection{Model Performance in Context}
+
+The achieved MAE of \$13.49/MWh compares favorably to benchmark studies on ERCOT price forecasting. For context:
+\begin{itemize}
+    \item This represents approximately 42\% of the median price (\$24.50/MWh)
+    \item During normal conditions (excluding January 2026 spikes), MAE falls to \$5-11/MWh
+    \item No-change baseline (persistence) would yield MAE $>$ \$25/MWh
+\end{itemize}
+
+\subsection{Value of Weather Covariates}
+
+The feature importance analysis confirms that temperature is the second-most important predictor after the 24-hour lag. Weather features collectively account for approximately 25\% of the total feature importance, justifying the integration of external weather data despite the additional complexity.
+
+\subsection{Limitations}
+
+Several limitations merit consideration:
+\begin{enumerate}
+    \item \textbf{Single pricing hub}: Results may differ for other ERCOT hubs (HB\_SOUTH, HB\_HOUSTON, HB\_WEST)
+    \item \textbf{Weather station}: Using a single location as proxy for the zone introduces spatial aggregation error
+    \item \textbf{Extreme events}: Model performance degrades significantly during price spikes, which are of greatest interest to risk managers
+    \item \textbf{Fuel prices}: Natural gas prices, a key driver of marginal generation costs, are not included
+\end{enumerate}
+
+\subsection{Future Work}
+
+Promising extensions include:
+\begin{itemize}
+    \item Quantile regression to provide prediction intervals
+    \item Incorporation of load forecasts and generation schedules
+    \item Ensemble methods combining multiple model types
+    \item Real-time market price forecasting
+\end{itemize}
+
+\section{Conclusion}
+
+This paper demonstrates that accurate day-ahead electricity price forecasting for ERCOT is achievable using gradient boosting with readily available weather data. The LightGBM model incorporating lag features, calendar variables, and weather covariates achieves an MAE of \$13.49/MWh over a 6-month cross-validation period, with performance improving to \$5-11/MWh during normal operating conditions.
+
+The analysis confirms the critical importance of price persistence (24-hour lag) and temperature as predictive features. Open-source tools (Python, LightGBM, mlforecast, Open-Meteo API) enable rapid development and deployment of production-quality forecasting systems.
+
+% References
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\appendix
+\section{Software and Data Availability}
+
+All code is implemented in Python 3.11 using the following packages:
+\begin{itemize}
+    \item \texttt{mlforecast} (v0.13+): Feature engineering and recursive forecasting
+    \item \texttt{lightgbm} (v4.3+): Gradient boosting model
+    \item \texttt{pandas}, \texttt{numpy}: Data manipulation
+    \item \texttt{matplotlib}: Visualization
+\end{itemize}
+
+Weather data: Open-Meteo Historical Weather API (free, no authentication required).
+
+Price data: ERCOT Market Information System (publicly available archives).
+
+\end{document}

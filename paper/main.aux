@@ -1,0 +1,59 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{ercot2024}
+\citation{weron2014electricity}
+\citation{lago2021forecasting}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
+\citation{openmeteo2024}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Data}{2}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Study Region}{2}{subsection.2.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces ERCOT electricity grid zones with HB\_NORTH highlighted (blue). Weather observations are collected from a station near Dallas (32.78°N, 96.80°W).}}{2}{figure.caption.2}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:map}{{1}{2}{ERCOT electricity grid zones with HB\_NORTH highlighted (blue). Weather observations are collected from a station near Dallas (32.78°N, 96.80°W)}{figure.caption.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Price Data}{2}{subsection.2.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Summary Statistics: HB\_NORTH Day-Ahead Prices}}{2}{table.caption.3}\protected@file@percent }
+\newlabel{tab:price_stats}{{1}{2}{Summary Statistics: HB\_NORTH Day-Ahead Prices}{table.caption.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Weather Data}{2}{subsection.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Methods}{2}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Feature Engineering}{2}{subsection.3.1}\protected@file@percent }
+\newlabel{sec:features}{{3.1}{2}{Feature Engineering}{subsection.3.1}{}}
+\citation{ke2017lightgbm}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.1}Lag Features (Autoregressive)}{3}{subsubsection.3.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.2}Rolling Statistics}{3}{subsubsection.3.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.3}Calendar Features}{3}{subsubsection.3.1.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.4}Weather Covariates}{3}{subsubsection.3.1.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Model Architecture}{3}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Recursive Multi-Step Forecasting}{3}{subsection.3.3}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Recursive 24-Hour Ahead Forecast}}{3}{algorithm.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Cross-Validation Strategy}{3}{subsection.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}Results}{4}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Cross-Validation Performance}{4}{subsection.4.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Cross-Validation Results (August 2025 -- January 2026)}}{4}{table.caption.4}\protected@file@percent }
+\newlabel{tab:cv_results}{{2}{4}{Cross-Validation Results (August 2025 -- January 2026)}{table.caption.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Monthly Performance}{4}{subsection.4.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces MAE by Month}}{4}{table.caption.5}\protected@file@percent }
+\newlabel{tab:monthly}{{3}{4}{MAE by Month}{table.caption.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Example Forecast}{4}{subsection.4.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Day-ahead price forecast for October 15, 2025. Black line shows actual prices; blue dashed line shows model predictions. MAE = \$4.52/MWh.}}{4}{figure.caption.6}\protected@file@percent }
+\newlabel{fig:example}{{2}{4}{Day-ahead price forecast for October 15, 2025. Black line shows actual prices; blue dashed line shows model predictions. MAE = \$4.52/MWh}{figure.caption.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Feature Importance}{4}{subsection.4.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces LightGBM feature importance by split count. Lag features (green) dominate, followed by weather features (red) and calendar features (blue).}}{4}{figure.caption.7}\protected@file@percent }
+\newlabel{fig:importance}{{3}{4}{LightGBM feature importance by split count. Lag features (green) dominate, followed by weather features (red) and calendar features (blue)}{figure.caption.7}{}}
+\bibstyle{plainnat}
+\bibdata{references}
+\bibcite{ercot2024}{{1}{2024}{{Electric Reliability Council of Texas}}{{}}}
+\bibcite{ke2017lightgbm}{{2}{2017}{{Ke et~al.}}{{Ke, Meng, Finley, Wang, Chen, Ma, Ye, and Liu}}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Hourly Error Analysis}{5}{subsection.4.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Discussion}{5}{section.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Model Performance in Context}{5}{subsection.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Value of Weather Covariates}{5}{subsection.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Limitations}{5}{subsection.5.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Future Work}{5}{subsection.5.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusion}{5}{section.6}\protected@file@percent }
+\bibcite{lago2021forecasting}{{3}{2021}{{Lago et~al.}}{{Lago, Marcjasz, De~Schutter, and Weron}}}
+\bibcite{openmeteo2024}{{4}{2024}{{Open-Meteo}}{{}}}
+\bibcite{weron2014electricity}{{5}{2014}{{Weron}}{{}}}
+\@writefile{toc}{\contentsline {section}{\numberline {A}Software and Data Availability}{6}{appendix.A}\protected@file@percent }
+\gdef \@abspage@last{6}
