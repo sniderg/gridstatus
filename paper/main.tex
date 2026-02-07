@@ -132,10 +132,10 @@ Price persistence is a dominant characteristic of electricity markets. We includ
 
 \subsubsection{Rolling Statistics}
 
-To capture local trends and volatility, we compute:
+To capture local trends and volatility, we compute a 24-hour rolling mean $\bar{y}_{t,24}$ and rolling standard deviation $\sigma_{t,24}$:
 \begin{align}
-    \bar{y}_{t,24} &= \frac{1}{24}\sum_{i=1}^{24} y_{t-24-i} \quad \text{(24-hour rolling mean)} \\
-    \sigma_{t,24} &= \sqrt{\frac{1}{24}\sum_{i=1}^{24} (y_{t-24-i} - \bar{y}_{t,24})^2} \quad \text{(24-hour rolling std)}
+    \bar{y}_{t,24} &= \frac{1}{24}\sum_{i=1}^{24} y_{t-24-i} \\
+    \sigma_{t,24} &= \sqrt{\frac{1}{24}\sum_{i=1}^{24} (y_{t-24-i} - \bar{y}_{t,24})^2}
 \end{align}
 
 \subsubsection{Calendar Features}
