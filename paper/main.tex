@@ -173,7 +173,7 @@ Key hyperparameters:
 
 The full feature vector at time $t$ is:
 \begin{equation}
-    \mathbf{x}_t = [\mathbf{x}_t^{\text{lag}}, \mathbf{x}_t^{\text{rolling}}, \mathbf{x}_t^{\text{calendar}}, \mathbf{x}_t^{\text{weather}}]^\top
+    \mathbf{x}_t = \begin{bmatrix} \mathbf{x}^{\text{lag}}_t \\ \mathbf{x}^{\text{roll}}_t \\ \mathbf{x}^{\text{cal}}_t \\ \mathbf{x}^{\text{wx}}_t \end{bmatrix}
 \end{equation}
 
 \subsection{Recursive Multi-Step Forecasting}
@@ -229,7 +229,7 @@ Table~\ref{tab:cv_results} summarizes the cross-validation results across the 18
 
 \subsection{Monthly Performance}
 
-Figure~\ref{fig:monthly} shows significant variation in forecast accuracy across months. Performance is strongest during mild shoulder seasons (September, October) and degrades during extreme weather periods.
+Table~\ref{tab:monthly} shows significant variation in forecast accuracy across months. Performance is strongest during mild shoulder seasons (September, October) and degrades during extreme weather periods.
 
 \begin{table}[H]
     \centering
@@ -282,7 +282,7 @@ Figure~\ref{fig:importance} displays the LightGBM feature importance scores (spl
 
 \subsection{Hourly Error Analysis}
 
-Error varies systematically by hour of day (Figure~\ref{fig:hourly_error}). The highest errors occur during:
+Error varies systematically by hour of day. The highest errors occur during:
 \begin{itemize}
     \item \textbf{Morning ramp (6-8 AM)}: MAE $\approx$ \$18/MWh
     \item \textbf{Evening peak (6-9 PM)}: MAE $\approx$ \$20-24/MWh
