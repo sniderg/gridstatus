@@ -35,17 +35,15 @@ def load_data():
 
 
 def create_quantile_models(quantiles=[0.1, 0.5, 0.9]):
-    """Create LightGBM models for each quantile."""
+    """Create LightGBM models for each quantile with optimized hyperparameters."""
+    base_params = dict(
+        n_estimators=625, learning_rate=0.011, max_depth=12, num_leaves=108,
+        min_child_samples=14, reg_alpha=0.0008, reg_lambda=0.0008,
+        subsample=0.72, colsample_bytree=0.81, random_state=42, verbose=-1
+    )
     models = {}
     for q in quantiles:
-        models[f'q{int(q*100)}'] = lgb.LGBMRegressor(
-            objective='quantile',
-            alpha=q,
-            n_estimators=500,
-            learning_rate=0.05,
-            random_state=42,
-            verbose=-1
-        )
+        models[f'q{int(q*100)}'] = lgb.LGBMRegressor(objective='quantile', alpha=q, **base_params)
     return models
 
 
@@ -54,12 +52,16 @@ def main():
     df, feature_cols = load_data()
     print(f"Data loaded: {len(df)} rows")
     
-    # Create quantile models
-    quantiles = [0.1, 0.5, 0.9]
+    # Create quantile models with optimized hyperparameters
+    base_params = dict(
+        n_estimators=625, learning_rate=0.011, max_depth=12, num_leaves=108,
+        min_child_samples=14, reg_alpha=0.0008, reg_lambda=0.0008,
+        subsample=0.72, colsample_bytree=0.81, random_state=42, verbose=-1
+    )
     models = {
-        'q10': lgb.LGBMRegressor(objective='quantile', alpha=0.1, n_estimators=500, learning_rate=0.05, random_state=42, verbose=-1),
-        'q50': lgb.LGBMRegressor(objective='quantile', alpha=0.5, n_estimators=500, learning_rate=0.05, random_state=42, verbose=-1),
-        'q90': lgb.LGBMRegressor(objective='quantile', alpha=0.9, n_estimators=500, learning_rate=0.05, random_state=42, verbose=-1),
+        'q10': lgb.LGBMRegressor(objective='quantile', alpha=0.1, **base_params),
+        'q50': lgb.LGBMRegressor(objective='quantile', alpha=0.5, **base_params),
+        'q90': lgb.LGBMRegressor(objective='quantile', alpha=0.9, **base_params),
     }
     
     # Create MLForecast with multiple quantile models
@@ -153,10 +155,15 @@ def main():
         if len(train_df) < 336 or len(test_df) < 24:
             continue
             
+        base_params = dict(
+            n_estimators=625, learning_rate=0.011, max_depth=12, num_leaves=108,
+            min_child_samples=14, reg_alpha=0.0008, reg_lambda=0.0008,
+            subsample=0.72, colsample_bytree=0.81, random_state=42, verbose=-1
+        )
         models_cv = {
-            'q10': lgb.LGBMRegressor(objective='quantile', alpha=0.1, n_estimators=500, learning_rate=0.05, random_state=42, verbose=-1),
-            'q50': lgb.LGBMRegressor(objective='quantile', alpha=0.5, n_estimators=500, learning_rate=0.05, random_state=42, verbose=-1),
-            'q90': lgb.LGBMRegressor(objective='quantile', alpha=0.9, n_estimators=500, learning_rate=0.05, random_state=42, verbose=-1),
+            'q10': lgb.LGBMRegressor(objective='quantile', alpha=0.1, **base_params),
+            'q50': lgb.LGBMRegressor(objective='quantile', alpha=0.5, **base_params),
+            'q90': lgb.LGBMRegressor(objective='quantile', alpha=0.9, **base_params),
         }
         fcst_cv = MLForecast(
             models=models_cv,

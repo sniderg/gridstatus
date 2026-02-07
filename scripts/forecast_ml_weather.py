@@ -100,7 +100,11 @@ def run_ml_forecast_with_weather():
     
     date_features = ['hour', 'dayofweek', 'month']
     
-    model = lgb.LGBMRegressor(random_state=42, n_estimators=500, learning_rate=0.05)
+    model = lgb.LGBMRegressor(
+        n_estimators=625, learning_rate=0.011, max_depth=12, num_leaves=108,
+        min_child_samples=14, reg_alpha=0.0008, reg_lambda=0.0008,
+        subsample=0.72, colsample_bytree=0.81, random_state=42, verbose=-1
+    )
     
     # Create MLForecast with dynamic exogenous features
     # Set static_features=[] to indicate all additional columns are time-varying
