@@ -43,6 +43,7 @@ def analyze_renewables_proxy():
     
     # Calculate Daily Metrics
     print("Calculating daily metrics...")
+    df.index = pd.to_datetime(df.index)
     daily = df.resample('D').agg({
         'price': ['std', 'max', 'mean'], 
         'wind_speed_10m': 'mean',
@@ -63,7 +64,7 @@ def analyze_renewables_proxy():
     print("Generating plots...")
     sns.set_theme(style="whitegrid")
     
-    fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+    fig, axes = plt.subplots(3, 1, figsize=(6, 12))
     
     # Scatter 1: Wind vs Volatility
     # Updated column name to match aggregation
