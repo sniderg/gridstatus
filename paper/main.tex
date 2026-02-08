@@ -470,8 +470,13 @@ Several limitations merit consideration:
     \item \textbf{Single pricing hub}: Results may differ for other ERCOT hubs (HB\_SOUTH, HB\_HOUSTON, HB\_WEST)
     \item \textbf{Weather station}: Using a single location as proxy for the zone introduces spatial aggregation error
     \item \textbf{Extreme events}: Model performance degrades significantly during price spikes, which are of greatest interest to risk managers
-
 \end{enumerate}
+
+\subsection{Cryptocurrency Mining Hypothesis}
+
+Given the significant growth of Bitcoin mining in Texas and its potential impact on demand response, we tested the inclusion of Bitcoin price and volatility features (BTC-USD daily close). Contrary to expectation, including these features degraded model performance (MASE increased from 0.803 to 0.865). This suggests that while miners are price-sensitive load, the global price of Bitcoin is not a direct predictor of day-ahead electricity prices in the current model architecture, or its signal is drowned out by stronger weather and autoregressive drivers.
+
+
 
 \subsection{Future Work}
 

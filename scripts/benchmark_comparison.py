@@ -39,15 +39,15 @@ def load_data():
     # Remove timezone from prices for merge
     prices['ds'] = prices['ds'].dt.tz_localize(None)
     
+    # Create date column for daily merges
+    prices['date'] = prices['ds'].dt.floor('D')
+
     # Load gas prices (daily)
     try:
         gas = pd.read_parquet("data/raw/gas_prices.parquet")
         # Ensure gas index is datetime
         if not isinstance(gas.index, pd.DatetimeIndex):
             gas.index = pd.to_datetime(gas.index)
-        
-        # Create date column for merge
-        prices['date'] = prices['ds'].dt.floor('D')
         
         # Merge gas prices
         prices = prices.merge(gas, left_on='date', right_index=True, how='left')
@@ -62,9 +62,14 @@ def load_data():
     except Exception as e:
         print(f"Warning: Could not load gas prices: {e}")
         feature_cols = ['temp', 'humidity', 'wind_speed', 'wind_gusts', 'solar_radiation', 'cloud_cover']
+
+
     
     # Merge on datetime - include all weather features
-    df = prices.merge(weather[['ds'] + [c for c in feature_cols if c != 'gas_price']], on='ds', how='inner')
+    # Note: feature_cols now includes gas and btc columns which are already in `prices`
+    # We only need to merge weather columns that are NOT yet in prices
+    weather_cols = ['temp', 'humidity', 'wind_speed', 'wind_gusts', 'solar_radiation', 'cloud_cover']
+    df = prices.merge(weather[['ds'] + weather_cols], on='ds', how='inner')
     df = df.sort_values('ds').reset_index(drop=True)
     
     # Drop temp date column
@@ -225,6 +230,8 @@ def lightgbm_forecast(df_train, df_test, feature_cols):
             
             # Gas x Hour interaction (peak hours are more sensitive to gas price)
             df['gas_hour'] = df['gas_price'] * df['hour']
+
+
         
         return df
     
@@ -259,6 +266,8 @@ def lightgbm_forecast(df_train, df_test, feature_cols):
     # Add gas features if available
     if 'gas_price' in combined.columns:
         model_features.extend(['gas_price', 'gas_temp', 'gas_hour'])
+
+
     
     # Filter to available columns
     available_features = [c for c in model_features if c in train.columns]
