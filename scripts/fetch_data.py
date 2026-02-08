@@ -27,12 +27,12 @@ def fetch_ercot_da_spp():
     # Be mindful of 250 call limit. One query is one call usually.
     
     today = datetime.now()
-    # Fetch just 7 days of history + forecast for testing to save API calls
-    start_date = (today - timedelta(days=7)).strftime("%Y-%m-%d")
+    # Fetch 5 years of history
+    start_date = "2020-01-01"
     end_date = (today + timedelta(days=2)).strftime("%Y-%m-%d") 
     
     # Check cache
-    cache_file = os.path.join(DATA_DIR, "ercot_da_spp.csv")
+    cache_file = os.path.join(DATA_DIR, "ercot_da_spp_5y.csv")
     
     print(f"Fetching ERCOT Day-Ahead SPP for HB_NORTH from {start_date} to {end_date}...")
     
@@ -43,7 +43,7 @@ def fetch_ercot_da_spp():
             end=end_date,
             filter_column="location",
             filter_value="HB_NORTH",
-            limit=10000 
+            limit=100000 
         )
         
         print(f"Fetched {len(df)} rows.")

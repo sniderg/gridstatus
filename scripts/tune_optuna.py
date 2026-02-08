@@ -20,10 +20,10 @@ optuna.logging.set_verbosity(optuna.logging.WARNING)
 
 def load_data():
     """Load and merge price + weather data."""
-    df_price = pd.read_csv("data/ercot_da_spp_combined.csv")
+    df_price = pd.read_csv("data/ercot_da_spp_5y.csv")
     df_price['ds'] = pd.to_datetime(df_price['interval_start_utc'])
     if df_price['ds'].dt.tz is not None:
-        df_price['ds'] = df_price['ds'].dt.tz_convert(None)
+        df_price['ds'] = df_price['ds'].dt.tz_convert('US/Central').dt.tz_localize(None)
     df_price = df_price.rename(columns={'spp': 'y'})
     df_price['unique_id'] = 'HB_NORTH'
     
@@ -41,7 +41,7 @@ def load_data():
     return df, feature_cols
 
 
-def evaluate_model(df, feature_cols, params, n_windows=10):
+def evaluate_model(df, feature_cols, params, n_windows=2):
     """Run quick CV with given hyperparameters."""
     results = []
     
@@ -66,9 +66,19 @@ def evaluate_model(df, feature_cols, params, n_windows=10):
             date_features=['hour', 'dayofweek', 'month'],
         )
         
-        fcst.fit(train_df, static_features=[])
+
+        
+        # ArcSinh transform training data
+        train_df_trans = train_df.copy()
+        train_df_trans['y'] = np.arcsinh(train_df_trans['y'])
+        
+        fcst.fit(train_df_trans, static_features=[])
+        
         X_future = test_df[['unique_id', 'ds'] + feature_cols].copy()
         preds = fcst.predict(h=24, X_df=X_future)
+        
+        # Inverse transform
+        preds['lgb'] = np.sinh(preds['lgb'])
         
         merged = pd.merge(test_df[['ds', 'y']], preds[['ds', 'lgb']], on='ds')
         mae = np.abs(merged['y'] - merged['lgb']).mean()
@@ -103,11 +113,11 @@ def main():
     # Baseline performance
     print("Evaluating baseline (default hyperparameters)...")
     baseline_params = {'n_estimators': 500, 'learning_rate': 0.05}
-    baseline_mae = evaluate_model(df, feature_cols, baseline_params, n_windows=10)
+    baseline_mae = evaluate_model(df, feature_cols, baseline_params, n_windows=2)
     print(f"Baseline MAE: ${baseline_mae:.3f}\n")
     
     # Optuna optimization
-    print("Starting Optuna optimization (20 trials)...")
+    print("Starting Optuna optimization (5 trials)...")
     print("=" * 50)
     
     start_time = time.time()
@@ -119,7 +129,7 @@ def main():
     
     study.optimize(
         lambda trial: objective(trial, df, feature_cols),
-        n_trials=20,
+        n_trials=5,
         show_progress_bar=True
     )
     

@@ -108,8 +108,9 @@ def main():
     """Fetch and save weather data."""
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     
-    # Fetch historical weather matching our price data range (2024-01-01 to 2026-01-31)
-    start_date = "2024-01-01"
+    # Fetch historical weather matching our price data range (2020-01-01 to 2026-01-31)
+    # Open-Meteo Archive usually lags by a few days
+    start_date = "2020-01-01"
     end_date = "2026-01-31"
     
     # Fetch historical data

@@ -9,14 +9,18 @@ import matplotlib.pyplot as plt
 import lightgbm as lgb
 from mlforecast import MLForecast
 from mlforecast.lag_transforms import RollingMean, RollingStd
+from mlforecast.lag_transforms import RollingMean, RollingStd
 import time
+
+# ArcSinh transform does not need a shift index (handles negative values)
+# SHIFT = 5
 
 def load_data():
     """Load and merge price + weather data."""
-    df_price = pd.read_csv("data/ercot_da_spp_combined.csv")
+    df_price = pd.read_csv("data/ercot_da_spp_5y.csv")
     df_price['ds'] = pd.to_datetime(df_price['interval_start_utc'])
     if df_price['ds'].dt.tz is not None:
-        df_price['ds'] = df_price['ds'].dt.tz_convert(None)
+        df_price['ds'] = df_price['ds'].dt.tz_convert('US/Central').dt.tz_localize(None)
     df_price = df_price.rename(columns={'spp': 'y'})
     df_price['unique_id'] = 'HB_NORTH'
     
@@ -37,9 +41,9 @@ def load_data():
 def create_quantile_models(quantiles=[0.1, 0.5, 0.9]):
     """Create LightGBM models for each quantile with optimized hyperparameters."""
     base_params = dict(
-        n_estimators=625, learning_rate=0.011, max_depth=12, num_leaves=108,
-        min_child_samples=14, reg_alpha=0.0008, reg_lambda=0.0008,
-        subsample=0.72, colsample_bytree=0.81, random_state=42, verbose=-1
+        n_estimators=425, learning_rate=0.1313, max_depth=10, num_leaves=80,
+        min_child_samples=12, reg_alpha=0.0006, reg_lambda=0.0002,
+        subsample=0.9465, colsample_bytree=0.8404, random_state=42, verbose=-1
     )
     models = {}
     for q in quantiles:
@@ -54,14 +58,16 @@ def main():
     
     # Create quantile models with optimized hyperparameters
     base_params = dict(
-        n_estimators=625, learning_rate=0.011, max_depth=12, num_leaves=108,
-        min_child_samples=14, reg_alpha=0.0008, reg_lambda=0.0008,
-        subsample=0.72, colsample_bytree=0.81, random_state=42, verbose=-1
+        n_estimators=425, learning_rate=0.1313, max_depth=10, num_leaves=80,
+        min_child_samples=12, reg_alpha=0.0006, reg_lambda=0.0002,
+        subsample=0.9465, colsample_bytree=0.8404, random_state=42, verbose=-1
     )
+
     models = {
         'q10': lgb.LGBMRegressor(objective='quantile', alpha=0.1, **base_params),
         'q50': lgb.LGBMRegressor(objective='quantile', alpha=0.5, **base_params),
         'q90': lgb.LGBMRegressor(objective='quantile', alpha=0.9, **base_params),
+        'mean': lgb.LGBMRegressor(objective='regression', **base_params),
     }
     
     # Create MLForecast with multiple quantile models
@@ -87,16 +93,38 @@ def main():
     print(f"Training on {len(train_df)} rows, testing on {len(test_df)} rows")
     
     start = time.time()
-    fcst.fit(train_df, static_features=[])
+    
+    # ArcSinh transform target for training
+    train_df_trans = train_df.copy()
+    train_df_trans['y'] = np.arcsinh(train_df_trans['y'])
+    
+    fcst.fit(train_df_trans, static_features=[])
+    
+    # Calculate residuals for mean correction (on transformed scale)
+    # We use in-sample predictions as a proxy for variance
+    prep = fcst.preprocess(train_df_trans, static_features=[])
+    X_train = prep.drop(columns=['unique_id', 'ds', 'y'])
+    y_pred_in_sample = fcst.models_['mean'].predict(X_train)
+    mse_trans = np.mean((prep['y'] - y_pred_in_sample)**2)
+    print(f"Transformed-scale MSE for mean correction: {mse_trans:.4f}")
     
     # Predict
     X_future = test_df[['unique_id', 'ds'] + feature_cols].copy()
-    preds = fcst.predict(h=24, X_df=X_future)
+    preds_trans = fcst.predict(h=24, X_df=X_future)
+    
+    # Inverse transform predictions
+    preds = preds_trans.copy()
+    for col in ['q10', 'q50', 'q90']:
+        preds[col] = np.sinh(preds[col])
+        
+    # Mean correction for ArcSinh: sinh(mu) * exp(sigma^2 / 2)
+    # See: E[sinh(z)] where z ~ N(mu, sigma^2)
+    preds['mean'] = np.sinh(preds['mean']) * np.exp(mse_trans/2)
     
     print(f"Prediction completed in {time.time()-start:.1f}s")
     
-    # Merge with actuals (column names are already q10, q50, q90)
-    results = pd.merge(test_df[['ds', 'y']], preds[['ds', 'q10', 'q50', 'q90']], on='ds')
+    # Merge with actuals
+    results = pd.merge(test_df[['ds', 'y']], preds[['ds', 'q10', 'q50', 'q90', 'mean']], on='ds')
     
     print("\nQuantile Predictions:")
     print(results.head(10))
@@ -125,10 +153,11 @@ def main():
     ax.fill_between(hours, results['q10'], results['q90'], alpha=0.3, color='steelblue', label='80% PI')
     ax.plot(hours, results['y'], 'ko-', markersize=6, linewidth=2, label='Actual')
     ax.plot(hours, results['q50'], 's--', color='#e74c3c', markersize=5, linewidth=1.5, label='Median (q50)')
+    ax.plot(hours, results['mean'], '^-', color='green', markersize=5, linewidth=1.5, label='Mean Forecast')
     
     ax.set_xlabel('Hour of Day')
     ax.set_ylabel('Price ($/MWh)')
-    ax.set_title(f'Quantile Regression Forecast: {test_day.strftime("%B %d, %Y")}')
+    ax.set_title(f'ArcSinh-Transformed Quantile Forecast: {test_day.strftime("%B %d, %Y")}')
     ax.set_xticks(range(0, 24, 2))
     ax.legend(loc='upper right')
     ax.set_xlim(-0.5, 23.5)
@@ -144,11 +173,12 @@ def main():
     
     # Extended CV for coverage statistics
     print("\n\nRunning extended CV for coverage statistics...")
-    n_windows = 30  # 30 days
+    n_windows = 7  # 7 days for verification (was 30)
     all_results = []
     
     for i in range(n_windows):
         test_day = pd.Timestamp('2025-10-15') - pd.Timedelta(days=i)
+        print(f"Propcessing window {i+1}/{n_windows}: {test_day.strftime('%Y-%m-%d')}")
         train_df = df[df['ds'] < test_day].copy()
         test_df = df[(df['ds'] >= test_day) & (df['ds'] < test_day + pd.Timedelta(days=1))].copy()
         
@@ -156,14 +186,15 @@ def main():
             continue
             
         base_params = dict(
-            n_estimators=625, learning_rate=0.011, max_depth=12, num_leaves=108,
-            min_child_samples=14, reg_alpha=0.0008, reg_lambda=0.0008,
-            subsample=0.72, colsample_bytree=0.81, random_state=42, verbose=-1
+            n_estimators=425, learning_rate=0.1313, max_depth=10, num_leaves=80,
+            min_child_samples=12, reg_alpha=0.0006, reg_lambda=0.0002,
+            subsample=0.9465, colsample_bytree=0.8404, random_state=42, verbose=-1
         )
         models_cv = {
             'q10': lgb.LGBMRegressor(objective='quantile', alpha=0.1, **base_params),
             'q50': lgb.LGBMRegressor(objective='quantile', alpha=0.5, **base_params),
             'q90': lgb.LGBMRegressor(objective='quantile', alpha=0.9, **base_params),
+            'mean': lgb.LGBMRegressor(objective='regression', **base_params),
         }
         fcst_cv = MLForecast(
             models=models_cv,
@@ -171,12 +202,30 @@ def main():
             lag_transforms={24: [RollingMean(window_size=24), RollingStd(window_size=24)], 168: [RollingMean(window_size=24)]},
             date_features=['hour', 'dayofweek', 'month'],
         )
-        fcst_cv.fit(train_df, static_features=[])
+        
+        # ArcSinh transform training data
+        train_df_trans = train_df.copy()
+        train_df_trans['y'] = np.arcsinh(train_df_trans['y'])
+        
+        fcst_cv.fit(train_df_trans, static_features=[])
+        
+        # Calculate residuals for mean correction (on transformed scale)
+        prep = fcst_cv.preprocess(train_df_trans, static_features=[])
+        X_train = prep.drop(columns=['unique_id', 'ds', 'y'])
+        y_pred_in_sample = fcst_cv.models_['mean'].predict(X_train)
+        mse_trans = np.mean((prep['y'] - y_pred_in_sample)**2)
         
         X_future = test_df[['unique_id', 'ds'] + feature_cols].copy()
-        preds = fcst_cv.predict(h=24, X_df=X_future)
+        preds_trans = fcst_cv.predict(h=24, X_df=X_future)
         
-        merged = pd.merge(test_df[['ds', 'y']], preds[['ds', 'q10', 'q50', 'q90']], on='ds')
+        # Inverse transform predictions
+        preds = preds_trans.copy()
+        for col in ['q10', 'q50', 'q90']:
+            preds[col] = np.sinh(preds[col])
+            
+        preds['mean'] = np.sinh(preds['mean']) * np.exp(mse_trans/2)
+        
+        merged = pd.merge(test_df[['ds', 'y']], preds[['ds', 'q10', 'q50', 'q90', 'mean']], on='ds')
         all_results.append(merged)
     
     cv_results = pd.concat(all_results, ignore_index=True)
@@ -184,11 +233,13 @@ def main():
     # Coverage statistics
     coverage_80 = ((cv_results['y'] >= cv_results['q10']) & (cv_results['y'] <= cv_results['q90'])).mean()
     mae_q50 = np.abs(cv_results['y'] - cv_results['q50']).mean()
+    mae_mean = np.abs(cv_results['y'] - cv_results['mean']).mean()
     interval_width = (cv_results['q90'] - cv_results['q10']).mean()
     
     print(f"\n30-Day CV Results:")
     print(f"  80% PI Coverage: {coverage_80*100:.1f}%")
     print(f"  Median MAE: ${mae_q50:.2f}")
+    print(f"  Mean Forecast MAE: ${mae_mean:.2f}")
     print(f"  Avg Interval Width: ${interval_width:.2f}")
     
     # Save stats

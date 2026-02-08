@@ -4,7 +4,7 @@ import os
 from datetime import datetime, timedelta
 
 DATA_DIR = "data"
-OUTPUT_FILE = os.path.join(DATA_DIR, "ercot_da_spp_scraper.csv")
+OUTPUT_FILE = os.path.join(DATA_DIR, "ercot_da_spp_5y.csv")
 
 def fetch_ercot_da_spp_scraper():
     """
@@ -16,8 +16,9 @@ def fetch_ercot_da_spp_scraper():
     
     # Define time range
     today = datetime.now()
-    # Let's get 365 days of history for seasonality/CV
-    start_date = (today - timedelta(days=365)).strftime("%Y-%m-%d")
+    today = datetime.now()
+    # Let's get 5 years of history
+    start_date = "2020-01-01"
     end_date = (today + timedelta(days=2)).strftime("%Y-%m-%d")
     
     print(f"Fetching ERCOT Day-Ahead SPP from {start_date} to {end_date}...")
@@ -59,6 +60,7 @@ def fetch_ercot_da_spp_scraper():
             df_node = df_node.rename(columns={
                 "Time": "interval_start_utc",
                 "SPP": "spp",
+                "Settlement Point Price": "spp", # Handle gridstatus normalization
                 "Location": "location"
             })
             

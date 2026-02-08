@@ -4,45 +4,45 @@ The top-level auxiliary file: main.aux
 The style file: plainnat.bst
 Database file #1: references.bib
 Warning--empty journal in ercot2024
-You've used 7 entries,
+You've used 8 entries,
             2773 wiz_defined-function locations,
-            634 strings with 6189 characters,
-and the built_in function-call counts, 3475 in all, are:
-= -- 303
-> -- 213
-< -- 5
-+ -- 73
-- -- 66
-* -- 275
-:= -- 538
-add.period$ -- 22
-call.type$ -- 7
-change.case$ -- 43
-chr.to.int$ -- 7
-cite$ -- 15
-duplicate$ -- 150
-empty$ -- 273
-format.name$ -- 75
-if$ -- 721
+            640 strings with 6300 characters,
+and the built_in function-call counts, 3931 in all, are:
+= -- 347
+> -- 234
+< -- 6
++ -- 80
+- -- 72
+* -- 312
+:= -- 606
+add.period$ -- 25
+call.type$ -- 8
+change.case$ -- 48
+chr.to.int$ -- 8
+cite$ -- 17
+duplicate$ -- 170
+empty$ -- 313
+format.name$ -- 84
+if$ -- 817
 int.to.chr$ -- 1
 int.to.str$ -- 1
-missing$ -- 6
-newline$ -- 44
-num.names$ -- 28
-pop$ -- 88
+missing$ -- 7
+newline$ -- 49
+num.names$ -- 32
+pop$ -- 96
 preamble$ -- 1
-purify$ -- 36
+purify$ -- 40
 quote$ -- 0
-skip$ -- 127
+skip$ -- 143
 stack$ -- 0
-substring$ -- 134
-swap$ -- 18
+substring$ -- 161
+swap$ -- 19
 text.length$ -- 1
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 77
+type$ -- 88
 warning$ -- 1
-while$ -- 29
+while$ -- 34
 width$ -- 0
-write$ -- 97
+write$ -- 110
 (There was 1 warning)
