@@ -100,7 +100,7 @@ def run_backtest(df, start_date, end_date, event_name):
         preds[col] = np.sinh(preds[col])
     preds['mean'] = np.sinh(preds['mean']) * np.exp(mse_trans/2)
     
-    results = pd.merge(test_df[['ds', 'y']], preds[['ds', 'q10', 'q50', 'q90', 'mean']], on='ds', how='inner')
+    results = pd.merge(test_df[['ds', 'y', 'temp']], preds[['ds', 'q10', 'q50', 'q90', 'mean']], on='ds', how='inner')
     results['event'] = event_name
     return results
 
@@ -146,19 +146,30 @@ def main():
         ax = axes[i]
         
         # Plot actuals
-        ax.plot(event_data['ds'], event_data['y'], 'k-', linewidth=1.5, label='Actual Price')
+        l1, = ax.plot(event_data['ds'], event_data['y'], 'k-', linewidth=1.5, label='Actual Price')
         
         # Plot forecast
-        ax.plot(event_data['ds'], event_data['mean'], 'g-', linewidth=2, label='Mean Forecast')
+        l2, = ax.plot(event_data['ds'], event_data['mean'], 'g-', linewidth=2, label='Mean Forecast')
         
         # Plot interval
         ax.fill_between(event_data['ds'], event_data['q10'], event_data['q90'], color='green', alpha=0.2, label='80% PI')
+        
+        # Secondary axis for temperature
+        ax2 = ax.twinx()
+        l3, = ax2.plot(event_data['ds'], event_data['temp'], 'b--', linewidth=1.5, alpha=0.6, label='Temperature')
+        ax2.set_ylabel('Temperature (°C)', color='blue')
+        ax2.tick_params(axis='y', labelcolor='blue')
         
         # Metrics title
         mae_val = np.abs(event_data['y'] - event_data['mean']).mean()
         ax.set_title(f"{name} (MAE: ${mae_val:.2f}/MWh)")
         ax.set_ylabel("Price ($/MWh)")
-        ax.legend(loc='upper left')
+        
+        # Combined legend
+        lines = [l1, l2, l3]
+        labels = [l.get_label() for l in lines]
+        ax.legend(lines, labels, loc='upper left')
+        
         ax.grid(True, alpha=0.3)
         
         # Format x-axis dates
