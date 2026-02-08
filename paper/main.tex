@@ -33,7 +33,7 @@
 
 % Abstract
 \begin{abstract}
-Accurate day-ahead electricity price forecasting is essential for market participants in deregulated power markets. This paper presents a machine learning approach for forecasting day-ahead locational marginal prices (LMPs) in the Electric Reliability Council of Texas (ERCOT) market. We develop a LightGBM gradient boosting model incorporating temporal features, autoregressive lag structures, and exogenous weather covariates from the Open-Meteo API. Using an expanding window cross-validation on \textbf{six years} of historical data (2020--2026), our model achieves an average mean absolute error (MAE) of \textbf{\$9.35/MWh} for the HB\_NORTH pricing hub during the 2025 test period. We extend the model to provide probabilistic forecasts via quantile regression, achieving 67.3\% coverage for 80\% prediction intervals. Feature importance analysis reveals that recent price lags and temperature are the dominant predictors. The model demonstrates robust performance even when trained on extreme volatility periods like Winter Storm Uri.
+Accurate day-ahead electricity price forecasting is essential for market participants in deregulated power markets. This paper presents a machine learning approach for forecasting day-ahead locational marginal prices (LMPs) in the Electric Reliability Council of Texas (ERCOT) market. We develop a LightGBM gradient boosting model incorporating temporal features, autoregressive lag structures, and exogenous weather covariates from the Open-Meteo API. Using an expanding window cross-validation on \textbf{six years} of historical data (2020--2026), our model achieves an average mean absolute error (MAE) of \textbf{\$9.33/MWh} for the HB\_NORTH pricing hub during the 2025 test period. We extend the model to provide probabilistic forecasts via quantile regression, achieving 67.3\% coverage for 80\% prediction intervals. Feature importance analysis reveals that recent price lags and temperature are the dominant predictors. The model demonstrates robust performance even when trained on extreme volatility periods like Winter Storm Uri.
 \end{abstract}
 
 % Keywords
@@ -394,11 +394,46 @@ Figure~\ref{fig:uri_diagnostic} provides a diagnostic analysis of the model's fa
     \label{fig:uri_diagnostic}
 \end{figure}
 
+\subsection{Benchmark Comparison}
+
+To validate the model's effectiveness, we benchmarked it against standard baselines using the Mean Absolute Scaled Error (MASE):
+\begin{enumerate}
+    \item \textbf{Naive Forecast}: Persists the price from 24 hours ago ($y_{t-24}$).
+    \item \textbf{Seasonal Naive}: Persists the price from 168 hours ago ($y_{t-168}$).
+\end{enumerate}
+
+Table~\ref{tab:benchmark} summarizes the results on the 2025 test set. The production LightGBM model outperforms the Naive baseline by 19.7\% (MASE 0.803 vs 1.000).
+
+\begin{table}[H]
+    \centering
+    \caption{Benchmark Comparison (2025 Test Set)}
+    \label{tab:benchmark}
+    \begin{tabular}{lcc}
+        \toprule
+        Model & MAE & MASE \\
+        \midrule
+        Naive (24h) & \$11.61 & 1.000 \\
+        Seasonal Naive (168h) & \$14.16 & 1.218 \\
+        LightGBM (Baseline) & \$9.46 & 0.813 \\
+        \textbf{LightGBM (w/ Gas)} & \textbf{\$9.33} & \textbf{0.803} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+The integration of Henry Hub natural gas futures provided a further 1.2\% improvement over the weather-only baseline, confirming the distinct predictive value of fuel cost dynamics.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/benchmark_comparison.png}
+    \caption{Performance comparison (MASE). Lower is better. The dashed line at 1.0 represents the Naive baseline. Our model achieves distinct improvement over both Naive and Seasonal Naive baselines.}
+    \label{fig:benchmark_fig}
+\end{figure}
+
 \section{Discussion}
 
 \subsection{Model Performance in Context}
 
-The achieved average MAE of \$9.35/MWh compares favorably to benchmark studies on ERCOT price forecasting. For context:
+The achieved average MAE of \$9.33/MWh compares favorably to benchmark studies on ERCOT price forecasting. For context:
 \begin{itemize}
     \item This represents approximately 38\% of the median price (\$24.68/MWh)
     \item During normal conditions (excluding January 2026 spikes), MAE falls to \$5--13/MWh
@@ -435,7 +470,7 @@ Several limitations merit consideration:
     \item \textbf{Single pricing hub}: Results may differ for other ERCOT hubs (HB\_SOUTH, HB\_HOUSTON, HB\_WEST)
     \item \textbf{Weather station}: Using a single location as proxy for the zone introduces spatial aggregation error
     \item \textbf{Extreme events}: Model performance degrades significantly during price spikes, which are of greatest interest to risk managers
-    \item \textbf{Fuel prices}: Natural gas prices, a key driver of marginal generation costs, are not included
+
 \end{enumerate}
 
 \subsection{Future Work}

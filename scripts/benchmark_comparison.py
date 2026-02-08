@@ -24,6 +24,7 @@ def load_data():
     
     # Rename columns to standard names
     prices = prices.rename(columns={'interval_start_utc': 'ds', 'spp': 'y'})
+    prices['ds'] = pd.to_datetime(prices['ds'], utc=True)
     weather = weather.rename(columns={
         'datetime': 'ds', 
         'temperature_2m': 'temp', 
@@ -33,14 +34,42 @@ def load_data():
         'shortwave_radiation': 'solar_radiation', 
         'cloud_cover': 'cloud_cover',
     })
+    weather['ds'] = pd.to_datetime(weather['ds'], utc=True).dt.tz_localize(None)
     
     # Remove timezone from prices for merge
     prices['ds'] = prices['ds'].dt.tz_localize(None)
     
+    # Load gas prices (daily)
+    try:
+        gas = pd.read_parquet("data/raw/gas_prices.parquet")
+        # Ensure gas index is datetime
+        if not isinstance(gas.index, pd.DatetimeIndex):
+            gas.index = pd.to_datetime(gas.index)
+        
+        # Create date column for merge
+        prices['date'] = prices['ds'].dt.floor('D')
+        
+        # Merge gas prices
+        prices = prices.merge(gas, left_on='date', right_index=True, how='left')
+        
+        # Forward fill any missing gas prices (e.g. recent days not yet in file)
+        prices['gas_price'] = prices['gas_price'].ffill().bfill()
+        
+        # Add gas_price to features
+        feature_cols = ['temp', 'humidity', 'wind_speed', 'wind_gusts', 'solar_radiation', 'cloud_cover', 'gas_price']
+        print(f"Loaded gas prices. Range: {gas.index.min()} to {gas.index.max()}")
+        
+    except Exception as e:
+        print(f"Warning: Could not load gas prices: {e}")
+        feature_cols = ['temp', 'humidity', 'wind_speed', 'wind_gusts', 'solar_radiation', 'cloud_cover']
+    
     # Merge on datetime - include all weather features
-    feature_cols = ['temp', 'humidity', 'wind_speed', 'wind_gusts', 'solar_radiation', 'cloud_cover']
-    df = prices.merge(weather[['ds'] + feature_cols], on='ds', how='inner')
+    df = prices.merge(weather[['ds'] + [c for c in feature_cols if c != 'gas_price']], on='ds', how='inner')
     df = df.sort_values('ds').reset_index(drop=True)
+    
+    # Drop temp date column
+    if 'date' in df.columns:
+        df = df.drop(columns=['date'])
     
     return df[['ds', 'y'] + feature_cols], feature_cols
 
@@ -189,6 +218,14 @@ def lightgbm_forecast(df_train, df_test, feature_cols):
         # Hour × temperature interaction (captures demand curve shifts)
         df['hour_temp'] = df['hour'] * df['temp']
         
+        # Gas price features (if available)
+        if 'gas_price' in df.columns:
+            # Gas x Temp interaction (high demand + high fuel cost = price spike)
+            df['gas_temp'] = df['gas_price'] * df['temp']
+            
+            # Gas x Hour interaction (peak hours are more sensitive to gas price)
+            df['gas_hour'] = df['gas_price'] * df['hour']
+        
         return df
     
     # Create features
@@ -200,7 +237,7 @@ def lightgbm_forecast(df_train, df_test, feature_cols):
     train = combined.iloc[:train_len].dropna()
     test = combined.iloc[train_len:]
     
-    # All feature columns
+    # All feature columns (time features removed for experiment)
     model_features = [
         # Time
         'hour', 'dayofweek', 'month', 'is_weekend',
@@ -209,14 +246,19 @@ def lightgbm_forecast(df_train, df_test, feature_cols):
         # Lags
         'lag_24', 'lag_48', 'lag_168', 'lag_336',
         # Rolling stats
-        'rolling_mean_24', 'rolling_std_24', 'rolling_mean_168', 'rolling_min_24', 'rolling_max_24',
-        # EWMA
+        'rolling_mean_24', 'rolling_std_24', 'rolling_min_24', 'rolling_max_24',
+        'rolling_mean_168',
+        # Exp Weighted Moving Average
         'ewma_24', 'ewma_168',
-        # Seasonal differences
+        # Seasonal Differences
         'diff_24', 'diff_168',
-        # Temperature features
-        'temp_deviation', 'hour_temp',
+        # Interactions
+        'temp_deviation', 'hour_temp'
     ]
+    
+    # Add gas features if available
+    if 'gas_price' in combined.columns:
+        model_features.extend(['gas_price', 'gas_temp', 'gas_hour'])
     
     # Filter to available columns
     available_features = [c for c in model_features if c in train.columns]
