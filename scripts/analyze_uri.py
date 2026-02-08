@@ -32,7 +32,7 @@ def analyze_uri():
     df = load_data()
     
     # Define periods
-    uri_start = pd.Timestamp('2021-02-14')
+    uri_start = pd.Timestamp('2021-02-12')
     uri_end = pd.Timestamp('2021-02-22')
     
     # Training data would have been everything before Uri
@@ -152,21 +152,20 @@ def create_diagnostic_figure(df, uri_start, uri_end, train_data):
                     alpha=0.3, color='red', label='Below Training Range')
     ax.set_xlabel('Date')
     ax.set_ylabel('Temperature (°C)')
-    ax.set_title('C) Temperature During Uri (Feb 14-22, 2021)')
-    ax.legend()
-    ax.tick_params(axis='x', rotation=45)
+    ax.set_title('C) Temperature During Uri (Feb 12-22, 2021)')
+    ax.legend(loc='lower right')
     
     # Panel D: Price during Uri week
     ax = axes[1, 1]
     ax.plot(uri_data['ds'], uri_data['price'], 'r-', linewidth=2)
-    ax.axhline(train_data['price'].max(), color='orange', linestyle='--', label=f'Training Max: ${train_data["price"].max():.0f}')
-    ax.axhline(9000, color='darkred', linestyle=':', linewidth=2, label='$9,000 Cap')
-    ax.fill_between(uri_data['ds'], uri_data['price'], train_data['price'].max(),
-                    where=uri_data['price'] > train_data['price'].max(),
-                    alpha=0.3, color='red', label='Above Training Range')
-    ax.set_xlabel('Date')
-    ax.set_ylabel('Price ($/MWh)')
-    ax.set_title('D) Prices During Uri (Feb 14-22, 2021)')
+    # Highlight area above training max
+    ax.fill_between(uri_data['ds'], uri_data['price'], train_data['price'].max(), 
+                    where=uri_data['price'] > train_data['price'].max(), 
+                    color='red', alpha=0.3, label='> Training Max')
+    
+    ax.set_ylabel('Price ($/MWh) - Log Scale')
+    ax.set_yscale('log')
+    ax.set_title('D) Prices During Uri (Feb 12-22, 2021)')
     ax.legend()
     ax.tick_params(axis='x', rotation=45)
     
