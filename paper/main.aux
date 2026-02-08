@@ -16,70 +16,52 @@
 \@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Summary Statistics: HB\_NORTH Day-Ahead Prices}}{2}{table.caption.3}\protected@file@percent }
 \newlabel{tab:price_stats}{{1}{2}{Summary Statistics: HB\_NORTH Day-Ahead Prices}{table.caption.3}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Weather Data}{2}{subsection.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Methods}{2}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Feature Engineering}{2}{subsection.3.1}\protected@file@percent }
+\newlabel{sec:features}{{3.1}{2}{Feature Engineering}{subsection.3.1}{}}
 \citation{ke2017lightgbm}
 \citation{optuna2019}
-\@writefile{toc}{\contentsline {section}{\numberline {3}Methods}{3}{section.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Feature Engineering}{3}{subsection.3.1}\protected@file@percent }
-\newlabel{sec:features}{{3.1}{3}{Feature Engineering}{subsection.3.1}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.1}Lag Features (Autoregressive)}{3}{subsubsection.3.1.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.2}Rolling Statistics}{3}{subsubsection.3.1.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.3}Calendar Features}{3}{subsubsection.3.1.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.4}Weather Covariates}{3}{subsubsection.3.1.4}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Model Architecture}{3}{subsection.3.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.3}ArcSinh Transformation and Mean Correction}{3}{subsection.3.3}\protected@file@percent }
-\citation{hyndman2006another}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Recursive Multi-Step Forecasting}{4}{subsection.3.4}\protected@file@percent }
 \@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Recursive 24-Hour Ahead Forecast}}{4}{algorithm.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.5}Cross-Validation Strategy}{4}{subsection.3.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {4}Results}{4}{section.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Benchmark Comparison}{4}{subsection.4.1}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Benchmark Comparison (2025 Test Set)}}{4}{table.caption.4}\protected@file@percent }
-\newlabel{tab:benchmark}{{2}{4}{Benchmark Comparison (2025 Test Set)}{table.caption.4}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Benchmark comparison. (A) Mean Absolute Error. (B) Mean Absolute Scaled Error—values below 1 indicate better performance than the naive baseline.}}{4}{figure.caption.5}\protected@file@percent }
-\newlabel{fig:benchmark}{{2}{4}{Benchmark comparison. (A) Mean Absolute Error. (B) Mean Absolute Scaled Error—values below 1 indicate better performance than the naive baseline}{figure.caption.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Cross-Validation Performance}{5}{subsection.4.2}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Verification Results (Full Year 2025)}}{5}{table.caption.6}\protected@file@percent }
-\newlabel{tab:cv_results}{{3}{5}{Verification Results (Full Year 2025)}{table.caption.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Monthly Performance}{5}{subsection.4.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Monthly MAE from January 2025 through January 2026. Green bars indicate months with below-average error; red indicates the January 2026 outlier. The dashed line shows the 2025 average MAE (\$9.36/MWh).}}{5}{figure.caption.7}\protected@file@percent }
-\newlabel{fig:monthly_mae}{{3}{5}{Monthly MAE from January 2025 through January 2026. Green bars indicate months with below-average error; red indicates the January 2026 outlier. The dashed line shows the 2025 average MAE (\$9.36/MWh)}{figure.caption.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Example Forecast}{5}{subsection.4.4}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Day-ahead price forecast for October 15, 2025. Black line shows actual prices; blue dashed line shows model predictions. MAE = \$4.52/MWh.}}{5}{figure.caption.8}\protected@file@percent }
-\newlabel{fig:example}{{4}{5}{Day-ahead price forecast for October 15, 2025. Black line shows actual prices; blue dashed line shows model predictions. MAE = \$4.52/MWh}{figure.caption.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Feature Importance}{5}{subsection.4.5}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces LightGBM feature importance by split count. Lag features (green) dominate, followed by weather features (red) and calendar features (blue).}}{5}{figure.caption.9}\protected@file@percent }
-\newlabel{fig:importance}{{5}{5}{LightGBM feature importance by split count. Lag features (green) dominate, followed by weather features (red) and calendar features (blue)}{figure.caption.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Cross-Validation Performance}{4}{subsection.4.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Verification Results (Full Year 2025)}}{4}{table.caption.4}\protected@file@percent }
+\newlabel{tab:cv_results}{{2}{4}{Verification Results (Full Year 2025)}{table.caption.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Monthly Performance}{4}{subsection.4.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces MAE by Month (Jan 2025 - Jan 2026)}}{4}{table.caption.5}\protected@file@percent }
+\newlabel{tab:monthly}{{3}{4}{MAE by Month (Jan 2025 - Jan 2026)}{table.caption.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Example Forecast}{4}{subsection.4.3}\protected@file@percent }
 \citation{nowotarski2018recent}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.6}Hourly Error Analysis}{6}{subsection.4.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.7}Probabilistic Forecasts}{6}{subsection.4.7}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Quantile Regression Results (30-Day CV)}}{6}{table.caption.10}\protected@file@percent }
-\newlabel{tab:quantile_results}{{4}{6}{Quantile Regression Results (30-Day CV)}{table.caption.10}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Probabilistic forecast with 80\% prediction interval (shaded). The median forecast (red dashed) tracks the actual price (black) closely. October 15, 2025.}}{6}{figure.caption.11}\protected@file@percent }
-\newlabel{fig:quantile}{{6}{6}{Probabilistic forecast with 80\% prediction interval (shaded). The median forecast (red dashed) tracks the actual price (black) closely. October 15, 2025}{figure.caption.11}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.8}Performance During Extreme Weather}{6}{subsection.4.8}\protected@file@percent }
-\citation{ercot2024}
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Model performance during three extreme weather events. The top panel shows Winter Storm Uri, where the model failed to capture the \$9,000/MWh scarcity pricing. The middle and bottom panels show performance during a summer heatwave and a strictly cold event, respectively.}}{7}{figure.caption.12}\protected@file@percent }
-\newlabel{fig:extreme}{{7}{7}{Model performance during three extreme weather events. The top panel shows Winter Storm Uri, where the model failed to capture the \$9,000/MWh scarcity pricing. The middle and bottom panels show performance during a summer heatwave and a strictly cold event, respectively}{figure.caption.12}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.8.1}Why the Model Failed During Winter Storm Uri}{7}{subsubsection.4.8.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Diagnostic analysis of Winter Storm Uri. (A) Temperature during Uri was far outside the training distribution. (B) Prices (log scale) reached 4.4$\times $ training maximum. (C) Hourly temperatures during Feb 14--19, 2021 with training range shown. (D) Hourly prices showing the \$9,000 cap. Shaded regions indicate values outside training range.}}{7}{figure.caption.13}\protected@file@percent }
-\newlabel{fig:uri_diagnostic}{{8}{7}{Diagnostic analysis of Winter Storm Uri. (A) Temperature during Uri was far outside the training distribution. (B) Prices (log scale) reached 4.4$\times $ training maximum. (C) Hourly temperatures during Feb 14--19, 2021 with training range shown. (D) Hourly prices showing the \$9,000 cap. Shaded regions indicate values outside training range}{figure.caption.13}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Day-ahead price forecast for October 15, 2025. Black line shows actual prices; blue dashed line shows model predictions. MAE = \$4.52/MWh.}}{5}{figure.caption.6}\protected@file@percent }
+\newlabel{fig:example}{{2}{5}{Day-ahead price forecast for October 15, 2025. Black line shows actual prices; blue dashed line shows model predictions. MAE = \$4.52/MWh}{figure.caption.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Feature Importance}{5}{subsection.4.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces LightGBM feature importance by split count. Lag features (green) dominate, followed by weather features (red) and calendar features (blue).}}{5}{figure.caption.7}\protected@file@percent }
+\newlabel{fig:importance}{{3}{5}{LightGBM feature importance by split count. Lag features (green) dominate, followed by weather features (red) and calendar features (blue)}{figure.caption.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Hourly Error Analysis}{5}{subsection.4.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.6}Probabilistic Forecasts}{5}{subsection.4.6}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Quantile Regression Results (30-Day CV)}}{6}{table.caption.8}\protected@file@percent }
+\newlabel{tab:quantile_results}{{4}{6}{Quantile Regression Results (30-Day CV)}{table.caption.8}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Probabilistic forecast with 80\% prediction interval (shaded). The median forecast (red dashed) tracks the actual price (black) closely. October 15, 2025.}}{6}{figure.caption.9}\protected@file@percent }
+\newlabel{fig:quantile}{{4}{6}{Probabilistic forecast with 80\% prediction interval (shaded). The median forecast (red dashed) tracks the actual price (black) closely. October 15, 2025}{figure.caption.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.7}Performance During Extreme Weather}{6}{subsection.4.7}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Model performance during three extreme weather events. The top panel shows Winter Storm Uri, where the model failed to capture the \$9,000/MWh scarcity pricing. The middle and bottom panels show performance during a summer heatwave and a strictly cold event, respectively.}}{7}{figure.caption.10}\protected@file@percent }
+\newlabel{fig:extreme}{{5}{7}{Model performance during three extreme weather events. The top panel shows Winter Storm Uri, where the model failed to capture the \$9,000/MWh scarcity pricing. The middle and bottom panels show performance during a summer heatwave and a strictly cold event, respectively}{figure.caption.10}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {5}Discussion}{7}{section.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Model Performance in Context}{7}{subsection.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Value of Weather Covariates}{7}{subsection.5.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Impact of Weather Covariates (30-Day CV)}}{7}{table.caption.11}\protected@file@percent }
+\newlabel{tab:weather_comparison}{{5}{7}{Impact of Weather Covariates (30-Day CV)}{table.caption.11}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Limitations}{7}{subsection.5.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Future Work}{7}{subsection.5.4}\protected@file@percent }
 \bibstyle{plainnat}
 \bibdata{references}
-\bibcite{optuna2019}{{1}{2019}{{Akiba et~al.}}{{Akiba, Sano, Yanase, Ohta, and Koyama}}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Value of Weather Covariates}{8}{subsection.5.2}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Impact of Weather Covariates (30-Day CV)}}{8}{table.caption.14}\protected@file@percent }
-\newlabel{tab:weather_comparison}{{5}{8}{Impact of Weather Covariates (30-Day CV)}{table.caption.14}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Limitations}{8}{subsection.5.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Future Work}{8}{subsection.5.4}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {6}Conclusion}{8}{section.6}\protected@file@percent }
-\bibcite{ercot2024}{{2}{2024}{{Electric Reliability Council of Texas}}{{}}}
-\bibcite{hyndman2006another}{{3}{2006}{{Hyndman and Koehler}}{{}}}
-\bibcite{ke2017lightgbm}{{4}{2017}{{Ke et~al.}}{{Ke, Meng, Finley, Wang, Chen, Ma, Ye, and Liu}}}
-\bibcite{lago2021forecasting}{{5}{2021}{{Lago et~al.}}{{Lago, Marcjasz, De~Schutter, and Weron}}}
-\bibcite{nowotarski2018recent}{{6}{2018}{{Nowotarski and Weron}}{{}}}
-\bibcite{openmeteo2024}{{7}{2024}{{Open-Meteo}}{{}}}
-\bibcite{weron2014electricity}{{8}{2014}{{Weron}}{{}}}
-\@writefile{toc}{\contentsline {section}{\numberline {A}Software and Data Availability}{9}{appendix.A}\protected@file@percent }
-\gdef \@abspage@last{9}
+\@writefile{toc}{\contentsline {section}{\numberline {A}Software and Data Availability}{8}{appendix.A}\protected@file@percent }
+\gdef \@abspage@last{8}

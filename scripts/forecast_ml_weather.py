@@ -1,7 +1,7 @@
-"""
+""
 Enhanced ML Forecast with Weather Covariates.
 Uses LightGBM with weather features (temperature, wind, solar) as exogenous regressors.
-"""
+""
 
 import pandas as pd
 import numpy as np
@@ -14,13 +14,13 @@ import time
 
 # File paths
 PRICE_DATA_FILE = "data/ercot_da_spp_combined.csv"
-WEATHER_HISTORICAL_FILE = "data/weather_historical.csv"
-WEATHER_FORECAST_FILE = "data/weather_forecast.csv"
+WEATHER_HISTORICAL_FILE = "data/raw/weather_historical.parquet"
+WEATHER_FORECAST_FILE = "data/raw/weather_forecast.csv"
 OUTPUT_DIR = "data"
 
 
 def load_and_merge_data():
-    """Load price and weather data, merge on datetime."""
+    ""Load price and weather data, merge on datetime.""
     
     # Load price data
     print("Loading price data...")
@@ -64,7 +64,7 @@ def load_and_merge_data():
 
 
 def load_future_weather():
-    """Load weather forecast for future predictions."""
+    ""Load weather forecast for future predictions.""
     df_forecast = pd.read_csv(WEATHER_FORECAST_FILE)
     df_forecast['datetime'] = pd.to_datetime(df_forecast['datetime'])
     
@@ -84,7 +84,7 @@ def load_future_weather():
 
 
 def run_ml_forecast_with_weather():
-    """Run ML forecast with weather covariates."""
+    ""Run ML forecast with weather covariates.""
     start_time = time.time()
     
     # Load data

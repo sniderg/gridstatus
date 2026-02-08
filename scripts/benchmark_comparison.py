@@ -19,8 +19,8 @@ warnings.filterwarnings('ignore')
 
 def load_data():
     """Load merged price and weather data with all features."""
-    prices = pd.read_csv('data/ercot_da_spp_5y.csv', parse_dates=['interval_start_utc'])
-    weather = pd.read_csv('data/weather_historical.csv', parse_dates=['datetime'])
+    prices = pd.read_parquet("data/raw/ercot_da_spp_5y.parquet")
+    weather = pd.read_parquet("data/raw/weather_historical.parquet")
     
     # Rename columns to standard names
     prices = prices.rename(columns={'interval_start_utc': 'ds', 'spp': 'y'})

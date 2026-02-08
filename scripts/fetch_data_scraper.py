@@ -7,10 +7,10 @@ DATA_DIR = "data"
 OUTPUT_FILE = os.path.join(DATA_DIR, "ercot_da_spp_5y.csv")
 
 def fetch_ercot_da_spp_scraper():
-    """
+    ""
     Fetch ERCOT Day-Ahead Settlement Point Prices using the open-source gridstatus scraper.
     This does NOT use the gridstatus.io API key.
-    """
+    ""
     print("Initialize ERCOT scraper...")
     iso = gridstatus.Ercot()
     

@@ -3,7 +3,7 @@ import numpy as np
 
 def main():
     # Load data
-    df = pd.read_csv("data/ercot_da_spp_5y.csv")
+    df = pd.read_parquet("data/raw/ercot_da_spp_5y.parquet")
     print(f"Loaded {len(df)} rows")
     
     # Table 1: Summary Statistics

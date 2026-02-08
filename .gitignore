@@ -5,3 +5,13 @@ __pycache__/
 .DS_Store
 data/
 .idea/
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.synctex.gz

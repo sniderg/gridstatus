@@ -1,7 +1,7 @@
-"""
+""
 Optuna Hyperparameter Tuning for LightGBM Electricity Price Forecaster.
 Quick 20-trial optimization with 10-day CV for speed.
-"""
+""
 
 import pandas as pd
 import numpy as np
@@ -19,15 +19,15 @@ optuna.logging.set_verbosity(optuna.logging.WARNING)
 
 
 def load_data():
-    """Load and merge price + weather data."""
-    df_price = pd.read_csv("data/ercot_da_spp_5y.csv")
+    ""Load and merge price + weather data.""
+    df_price = pd.read_parquet("data/raw/ercot_da_spp_5y.parquet")
     df_price['ds'] = pd.to_datetime(df_price['interval_start_utc'])
     if df_price['ds'].dt.tz is not None:
         df_price['ds'] = df_price['ds'].dt.tz_convert('US/Central').dt.tz_localize(None)
     df_price = df_price.rename(columns={'spp': 'y'})
     df_price['unique_id'] = 'HB_NORTH'
     
-    df_weather = pd.read_csv("data/weather_historical.csv")
+    df_weather = pd.read_parquet("data/raw/weather_historical.parquet")
     df_weather['datetime'] = pd.to_datetime(df_weather['datetime'])
     df_weather = df_weather.rename(columns={
         'datetime': 'ds', 'temperature_2m': 'temp', 'relative_humidity_2m': 'humidity',
@@ -42,7 +42,7 @@ def load_data():
 
 
 def evaluate_model(df, feature_cols, params, n_windows=2):
-    """Run quick CV with given hyperparameters."""
+    ""Run quick CV with given hyperparameters.""
     results = []
     
     for i in range(n_windows):
@@ -88,7 +88,7 @@ def evaluate_model(df, feature_cols, params, n_windows=2):
 
 
 def objective(trial, df, feature_cols):
-    """Optuna objective function."""
+    ""Optuna objective function.""
     params = {
         'n_estimators': trial.suggest_int('n_estimators', 200, 800),
         'learning_rate': trial.suggest_float('learning_rate', 0.01, 0.15, log=True),

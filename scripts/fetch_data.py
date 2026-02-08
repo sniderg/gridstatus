@@ -10,13 +10,13 @@ API_KEY = os.getenv("GRIDSTATUS_API_KEY")
 DATA_DIR = "data"
 
 def fetch_ercot_da_spp():
-    """
+    ""
     Fetch ERCOT Day-Ahead Settlement Point Prices.
     Tries to stick to the 'day ahead' concept. 
     If today is Day 0, we typically want Day 1 forecast.
     
     The API might allow us to query a range.
-    """
+    ""
     if not API_KEY:
         raise ValueError("GRIDSTATUS_API_KEY not found in .env")
 

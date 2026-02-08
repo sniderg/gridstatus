@@ -9,16 +9,16 @@ import warnings
 warnings.filterwarnings('ignore')
 
 def load_data():
-    """Load and merge price + weather data."""
+    ""Load and merge price + weather data.""
     print("Loading data...")
-    df_price = pd.read_csv("data/ercot_da_spp_5y.csv")
+    df_price = pd.read_parquet("data/raw/ercot_da_spp_5y.parquet")
     df_price['ds'] = pd.to_datetime(df_price['interval_start_utc'])
     if df_price['ds'].dt.tz is not None:
         df_price['ds'] = df_price['ds'].dt.tz_convert('US/Central').dt.tz_localize(None)
     df_price = df_price.rename(columns={'spp': 'y'})
     df_price['unique_id'] = 'HB_NORTH'
     
-    df_weather = pd.read_csv("data/weather_historical.csv")
+    df_weather = pd.read_parquet("data/raw/weather_historical.parquet")
     df_weather['datetime'] = pd.to_datetime(df_weather['datetime'])
     df_weather = df_weather.rename(columns={
         'datetime': 'ds', 'temperature_2m': 'temp', 'relative_humidity_2m': 'humidity',
@@ -32,7 +32,7 @@ def load_data():
     return df, feature_cols
 
 def run_backtest(df, start_date, end_date, event_name):
-    """Run forecast for a specific date range (train once before start)."""
+    ""Run forecast for a specific date range (train once before start).""
     print(f"\nRunning backtest for {event_name} ({start_date} to {end_date})...")
     
     test_start = pd.Timestamp(start_date)

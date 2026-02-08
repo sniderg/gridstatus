@@ -13,10 +13,10 @@ TARGET_YEARS = [2024, 2025, 2026]
 TARGET_NODE = "HB_NORTH"
 
 def process_dataframe(df_year, year, filename, sheet_name):
-    """
+    ""
     Process a single dataframe (from one sheet or CSV), filter for HB_NORTH, 
     and return the cleaned dataframe. Returns None if empty or invalid.
-    """
+    ""
     try:
         # Normalize columns
         df_year.columns = [str(c).strip() for c in df_year.columns]
@@ -82,7 +82,7 @@ def fetch_historical_data():
     target_docs = []
     for entry in docs:
         doc = entry.get("Document", {})
-        friendly_name = doc.get("FriendlyName", "")
+        friendly_name = doc.get("FriendlyName", ")
         # Expect naming confirmation: DAMLZHBSPP_2024
         for year in TARGET_YEARS:
             if f"_{year}" in friendly_name and "DAMLZHBSPP" in friendly_name:

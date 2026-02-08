@@ -1,7 +1,7 @@
-"""
+""
 Quantile Regression for ERCOT Price Forecasting.
 Provides prediction intervals (10th, 50th, 90th percentiles).
-"""
+""
 
 import pandas as pd
 import numpy as np
@@ -16,15 +16,15 @@ import time
 # SHIFT = 5
 
 def load_data():
-    """Load and merge price + weather data."""
-    df_price = pd.read_csv("data/ercot_da_spp_5y.csv")
+    ""Load and merge price + weather data.""
+    df_price = pd.read_parquet("data/raw/ercot_da_spp_5y.parquet")
     df_price['ds'] = pd.to_datetime(df_price['interval_start_utc'])
     if df_price['ds'].dt.tz is not None:
         df_price['ds'] = df_price['ds'].dt.tz_convert('US/Central').dt.tz_localize(None)
     df_price = df_price.rename(columns={'spp': 'y'})
     df_price['unique_id'] = 'HB_NORTH'
     
-    df_weather = pd.read_csv("data/weather_historical.csv")
+    df_weather = pd.read_parquet("data/raw/weather_historical.parquet")
     df_weather['datetime'] = pd.to_datetime(df_weather['datetime'])
     df_weather = df_weather.rename(columns={
         'datetime': 'ds', 'temperature_2m': 'temp', 'relative_humidity_2m': 'humidity',
@@ -39,7 +39,7 @@ def load_data():
 
 
 def create_quantile_models(quantiles=[0.1, 0.5, 0.9]):
-    """Create LightGBM models for each quantile with optimized hyperparameters."""
+    ""Create LightGBM models for each quantile with optimized hyperparameters.""
     base_params = dict(
         n_estimators=425, learning_rate=0.1313, max_depth=10, num_leaves=80,
         min_child_samples=12, reg_alpha=0.0006, reg_lambda=0.0002,

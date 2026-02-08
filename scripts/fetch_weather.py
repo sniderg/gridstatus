@@ -1,7 +1,7 @@
-"""
+""
 Fetch historical weather data from Open-Meteo API for ERCOT region.
 Uses the free Open-Meteo Historical Weather API (no API key required).
-"""
+""
 
 import pandas as pd
 import requests
@@ -30,7 +30,7 @@ HOURLY_VARIABLES = [
 
 
 def fetch_historical_weather(start_date: str, end_date: str) -> pd.DataFrame:
-    """
+    ""
     Fetch historical weather data from Open-Meteo Archive API.
     
     Args:
@@ -39,7 +39,7 @@ def fetch_historical_weather(start_date: str, end_date: str) -> pd.DataFrame:
     
     Returns:
         DataFrame with hourly weather data
-    """
+    ""
     url = "https://archive-api.open-meteo.com/v1/archive"
     
     params = {
@@ -70,12 +70,12 @@ def fetch_historical_weather(start_date: str, end_date: str) -> pd.DataFrame:
 
 
 def fetch_weather_forecast() -> pd.DataFrame:
-    """
+    ""
     Fetch weather forecast from Open-Meteo Forecast API.
     
     Returns:
         DataFrame with hourly forecast data (up to 16 days)
-    """
+    ""
     url = "https://api.open-meteo.com/v1/forecast"
     
     params = {
@@ -105,7 +105,7 @@ def fetch_weather_forecast() -> pd.DataFrame:
 
 
 def main():
-    """Fetch and save weather data."""
+    ""Fetch and save weather data.""
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     
     # Fetch historical weather matching our price data range (2020-01-01 to 2026-01-31)

@@ -7,7 +7,7 @@ import os
 
 def analyze_skew():
     # Load data
-    df = pd.read_csv("data/ercot_da_spp_5y.csv")
+    df = pd.read_parquet("data/raw/ercot_da_spp_5y.parquet")
     price = df['spp']
     
     # Calculate original skewness
@@ -50,7 +50,7 @@ def analyze_skew():
     
     # Log Transformed Histogram
     axes[1].hist(log_price, bins=50, color='salmon', edgecolor='black', alpha=0.7)
-    title_suffix = f" (Shifted by +{shift})" if shift > 0 else ""
+    title_suffix = f" (Shifted by +{shift})" if shift > 0 else "
     axes[1].set_title(f'Log-Transformed Price Distribution\nSkewness: {log_skew:.2f}{title_suffix}')
     axes[1].set_xlabel('Log(Price)')
     axes[1].set_ylabel('Frequency')
