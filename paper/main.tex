@@ -33,7 +33,7 @@
 
 % Abstract
 \begin{abstract}
-Accurate day-ahead electricity price forecasting is essential for market participants in deregulated power markets. This paper presents a machine learning approach for forecasting day-ahead locational marginal prices (LMPs) in the Electric Reliability Council of Texas (ERCOT) market. We develop a LightGBM gradient boosting model incorporating temporal features, autoregressive lag structures, and exogenous weather covariates from the Open-Meteo API. Using an expanding window cross-validation on \textbf{six years} of historical data (2020--2026), our model achieves an average mean absolute error (MAE) of \textbf{\$9.33/MWh} for the HB\_NORTH pricing hub during the 2025 test period. We extend the model to provide probabilistic forecasts via quantile regression, achieving 67.3\% coverage for 80\% prediction intervals. Feature importance analysis reveals that recent price lags and temperature are the dominant predictors. The model demonstrates robust performance even when trained on extreme volatility periods like Winter Storm Uri.
+Accurate day-ahead electricity price forecasting is essential for market participants in deregulated power markets. This paper presents a machine learning approach for forecasting day-ahead locational marginal prices (LMPs) in the Electric Reliability Council of Texas (ERCOT) market. We develop a LightGBM gradient boosting model incorporating temporal features, autoregressive lag structures, and exogenous weather covariates from the Open-Meteo API. Using an expanding window cross-validation on \textbf{six years} of historical data (2020--2026), our model achieves an average mean absolute error (MAE) of \textbf{\$9.33/MWh} for the HB\_NORTH pricing hub during the 2025 test period. We extend the model to provide probabilistic forecasts via quantile regression, achieving 67.3\% coverage for 80\% prediction intervals. Feature importance analysis reveals that natural gas prices, recent price lags, and temperature are the dominant predictors. The model demonstrates robust performance even when trained on extreme volatility periods like Winter Storm Uri.
 \end{abstract}
 
 % Keywords
@@ -437,7 +437,7 @@ To quantify the benefit of weather data, we compare model performance with and w
     \end{tabular}
 \end{table}
 
-Weather features reduce MAE by 5.4\% during normal operating conditions. The feature importance analysis confirms that temperature is the second-most important predictor after the 24-hour lag, with weather features collectively accounting for approximately 25\% of total feature importance. This improvement justifies the integration of external weather data despite the additional complexity.
+Weather features reduce MAE by 5.4\% during normal operating conditions. The feature importance analysis confirms that natural gas price is the single most dominant predictor, surpassing even the 24-hour lag. Temperature remains a critical driver, with weather and fuel features collectively accounting for significant predictive power. This improvement justifies the integration of external data despite the additional complexity.
 
 Interestingly, while explicit time features (hour-of-day, day-of-week) rank low individually in feature importance, ablation experiments show that removing them degrades MASE from 0.813 to 0.840---a 3.3\% decline. This suggests the lag features do not fully capture temporal patterns, and the seemingly redundant time encodings provide complementary predictive signal.
 
@@ -471,7 +471,7 @@ Promising extensions include:
 
 This paper demonstrates that accurate day-ahead electricity price forecasting for ERCOT is achievable using gradient boosting with readily available weather data. The LightGBM model incorporating lag features, rolling statistics, exponentially weighted moving averages, and weather covariates achieves a Mean Absolute Scaled Error (MASE) of 0.813---an 18.5\% improvement over the naive persistence baseline---with an average MAE of \$9.46/MWh over the 2025 test period. Quantile regression extends the framework to provide probabilistic forecasts with calibrated prediction intervals.
 
-The analysis confirms the critical importance of price persistence (rolling means and lags) and temperature as predictive features, while ablation experiments reveal that explicit time encodings provide complementary signal despite low individual feature importance. Open-source tools (Python, LightGBM, mlforecast, Open-Meteo API) enable rapid development and deployment of production-quality forecasting systems.
+The analysis confirms the primacy of fuel costs (natural gas) alongside price persistence and temperature as predictive features, while ablation experiments reveal that explicit time encodings provide complementary signal despite low individual feature importance. Open-source tools (Python, LightGBM, mlforecast, Open-Meteo API) enable rapid development and deployment of production-quality forecasting systems.
 
 % References
 \bibliographystyle{plainnat}
