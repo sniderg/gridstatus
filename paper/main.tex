@@ -501,12 +501,12 @@ Code repository: \url{https://github.com/sniderg/gridstatus}
 
 To investigate the hypothesis that increasing renewable penetration drives price volatility, we analyzed the correlation between renewable generation proxies and daily price statistics (standard deviation and maximum price) over the 2020--2025 period. Due to the unavailability of granular historical fuel mix data, we used weather variables as proxies for renewable potential: daily mean wind speed (10m) for wind generation and daily total shortwave radiation for solar generation.
 
-\begin{figure}[ht!]
+\begin{figure*}[ht!]
     \centering
     \includegraphics[width=\textwidth]{figures/renewables_proxy_volatility.png}
     \caption{Correlation between daily price volatility (standard deviation) and renewable proxies (Wind Speed, Solar Radiation) vs. System Load. Wind speed shows no correlation with price volatility ($\rho = -0.03$), while solar radiation shows a weak positive correlation ($\rho = 0.10$). System load remains the strongest driver of volatility ($\rho = 0.21$).}
     \label{fig:renewables_volatility}
-\end{figure}
+\end{figure*}
 
 As shown in Figure~\ref{fig:renewables_volatility}, we found no significant correlation between daily wind speed and price volatility ($\rho = -0.03$), suggesting that wind variability alone is not the primary driver of price instability in the current market regime. Solar radiation exhibits a weak positive correlation ($\rho = 0.10$), likely confounded by the strong seasonality of demand (high solar coincident with high summer load). In contrast, daily peak system load shows a moderate positive correlation ($\rho = 0.21$) with price volatility, confirming that demand scarcity remains a more dominant factor than renewable intermittency at the daily aggregate level.
 
