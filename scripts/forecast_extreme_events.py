@@ -9,7 +9,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 def load_data():
-    ""Load and merge price + weather data.""
+    """Load and merge price + weather data."""
     print("Loading data...")
     df_price = pd.read_parquet("data/raw/ercot_da_spp_5y.parquet")
     df_price['ds'] = pd.to_datetime(df_price['interval_start_utc'])
@@ -32,7 +32,7 @@ def load_data():
     return df, feature_cols
 
 def run_backtest(df, start_date, end_date, event_name):
-    ""Run forecast for a specific date range (train once before start).""
+    """Run forecast for a specific date range (train once before start)."""
     print(f"\nRunning backtest for {event_name} ({start_date} to {end_date})...")
     
     test_start = pd.Timestamp(start_date)
@@ -109,7 +109,7 @@ def main():
     
     # Define events
     events = [
-        ('Winter Storm Uri', '2021-02-12', '2021-02-19'),
+        ('Winter Storm Uri', '2021-02-12', '2021-02-22'),
         ('Summer Heatwave 2023', '2023-08-15', '2023-08-25'),
         ('Jan 2024 Freeze', '2024-01-13', '2024-01-17')
     ]

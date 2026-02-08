@@ -33,7 +33,7 @@ def analyze_uri():
     
     # Define periods
     uri_start = pd.Timestamp('2021-02-14')
-    uri_end = pd.Timestamp('2021-02-19')
+    uri_end = pd.Timestamp('2021-02-22')
     
     # Training data would have been everything before Uri
     train_data = df[df['ds'] < uri_start]
@@ -152,7 +152,7 @@ def create_diagnostic_figure(df, uri_start, uri_end, train_data):
                     alpha=0.3, color='red', label='Below Training Range')
     ax.set_xlabel('Date')
     ax.set_ylabel('Temperature (°C)')
-    ax.set_title('C) Temperature During Uri (Feb 14-19, 2021)')
+    ax.set_title('C) Temperature During Uri (Feb 14-22, 2021)')
     ax.legend()
     ax.tick_params(axis='x', rotation=45)
     
@@ -166,7 +166,7 @@ def create_diagnostic_figure(df, uri_start, uri_end, train_data):
                     alpha=0.3, color='red', label='Above Training Range')
     ax.set_xlabel('Date')
     ax.set_ylabel('Price ($/MWh)')
-    ax.set_title('D) Prices During Uri (Feb 14-19, 2021)')
+    ax.set_title('D) Prices During Uri (Feb 14-22, 2021)')
     ax.legend()
     ax.tick_params(axis='x', rotation=45)
     
