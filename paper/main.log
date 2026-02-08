@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.3.8)  8 FEB 2026 11:54
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.3.8)  8 FEB 2026 12:01
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -608,150 +608,142 @@ Underfull \hbox (badness 1314) in paragraph at lines 216--217
 \T1/cmr/m/n/10.95 with 180 win-dows cov-er-ing ap-prox-i-mately 6
  []
 
-
-
-
-Overfull \hbox (8.27267pt too wide) detected at line 232
-[][][][] \OT1/cmr/m/n/10.95 = [] = []
- []
-
-<figures/benchmark_comparison.png, id=214, 715.2321pt x 353.4003pt>
+<figures/benchmark_comparison.png, id=210, 715.2321pt x 353.4003pt>
 File: figures/benchmark_comparison.png Graphic file (type png)
 <use figures/benchmark_comparison.png>
 Package pdftex.def Info: figures/benchmark_comparison.png  used on input line 2
-53.
+31.
 (pdftex.def)             Requested size: 229.8775pt x 113.5811pt.
 
-Underfull \hbox (badness 1314) in paragraph at lines 258--259
-\T1/cmr/m/n/10.95 fea-tures with rolling statis-tics, ex-po-nen-tially
- []
 
 
-Underfull \hbox (badness 1048) in paragraph at lines 258--259
-\T1/cmr/m/n/10.95 weighted mov-ing av-er-ages, and temperature-
- []
-
-
-
-[4 <./figures/benchmark_comparison.png>]
-Underfull \hbox (badness 1014) in paragraph at lines 281--282
+Underfull \hbox (badness 1014) in paragraph at lines 259--260
 \T1/cmr/m/n/10.95 Figure []3[] shows sig-nif-i-cant vari-a-tion in fore-
  []
 
-<figures/monthly_mae.png, id=232, 714.9912pt x 353.6412pt>
+<figures/monthly_mae.png, id=214, 714.9912pt x 353.6412pt>
 File: figures/monthly_mae.png Graphic file (type png)
 <use figures/monthly_mae.png>
-Package pdftex.def Info: figures/monthly_mae.png  used on input line 285.
+Package pdftex.def Info: figures/monthly_mae.png  used on input line 263.
 (pdftex.def)             Requested size: 229.8775pt x 113.6963pt.
-<figures/example_day_forecast.png, id=234, 715.473pt x 281.853pt>
+
+
+[4 <./figures/benchmark_comparison.png>]
+<figures/example_day_forecast.png, id=228, 715.473pt x 281.853pt>
 File: figures/example_day_forecast.png Graphic file (type png)
 <use figures/example_day_forecast.png>
 Package pdftex.def Info: figures/example_day_forecast.png  used on input line 2
-96.
+74.
 (pdftex.def)             Requested size: 229.8775pt x 90.55606pt.
 
 
-<figures/feature_importance.png, id=236, 715.473pt x 570.4512pt>
+<figures/feature_importance.png, id=230, 715.473pt x 570.4512pt>
 File: figures/feature_importance.png Graphic file (type png)
 <use figures/feature_importance.png>
-Package pdftex.def Info: figures/feature_importance.png  used on input line 314
+Package pdftex.def Info: figures/feature_importance.png  used on input line 292
 .
 (pdftex.def)             Requested size: 229.8775pt x 183.27927pt.
 
-
-[5 <./figures/monthly_mae.png> <./figures/example_day_forecast.png> <./figures/
-feature_importance.png>]
-Underfull \hbox (badness 2261) in paragraph at lines 323--324
+Underfull \hbox (badness 2261) in paragraph at lines 301--302
 []\T1/cmr/bx/n/10.95 Morning ramp (6-8 AM)\T1/cmr/m/n/10.95 : MAE $\OMS/cmsy/m/
 n/10.95 ^^Y$
  []
 
 
-Underfull \hbox (badness 5741) in paragraph at lines 337--338
+Underfull \hbox (badness 5741) in paragraph at lines 315--316
 []\T1/cmr/m/n/10.95 We train three quan-tile mod-els ($\OML/cmm/m/it/10.95 ^^\ 
 \OMS/cmsy/m/n/10.95 2
  []
 
 
-Underfull \hbox (badness 1348) in paragraph at lines 354--355
+
+[5 <./figures/monthly_mae.png> <./figures/example_day_forecast.png> <./figures/
+feature_importance.png>]
+Underfull \hbox (badness 1348) in paragraph at lines 332--333
 \T1/cmr/m/n/10.95 mized hy-per-pa-ram-e-ters im-prov-ing cal-i-bra-tion
  []
 
-<figures/quantile_forecast.png, id=256, 715.2321pt x 353.8821pt>
+<figures/quantile_forecast.png, id=252, 715.2321pt x 353.8821pt>
 File: figures/quantile_forecast.png Graphic file (type png)
 <use figures/quantile_forecast.png>
-Package pdftex.def Info: figures/quantile_forecast.png  used on input line 358.
+Package pdftex.def Info: figures/quantile_forecast.png  used on input line 336.
 
 (pdftex.def)             Requested size: 229.8775pt x 113.73595pt.
 
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 363--363
+Underfull \hbox (badness 10000) in paragraph at lines 341--341
 []\T1/cmr/bx/n/12 Performance Dur-ing Ex-treme
  []
 
 
-Underfull \hbox (badness 1163) in paragraph at lines 372--373
+
+
+Underfull \hbox (badness 1163) in paragraph at lines 350--351
 \T1/cmr/m/n/10.95 trans-for-ma-tion helps, the model still under-
  []
 
-<figures/extreme_events.png, id=258, 722.7pt x 867.24pt>
+<figures/extreme_events.png, id=254, 722.7pt x 867.24pt>
 File: figures/extreme_events.png Graphic file (type png)
 <use figures/extreme_events.png>
-Package pdftex.def Info: figures/extreme_events.png  used on input line 376.
+Package pdftex.def Info: figures/extreme_events.png  used on input line 354.
 (pdftex.def)             Requested size: 229.8775pt x 275.85512pt.
 
-Underfull \vbox (badness 1590) has occurred while \output is active []
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
 
-[6 <./figures/quantile_forecast.png>]
-Underfull \hbox (badness 1859) in paragraph at lines 387--388
+[6 <./figures/quantile_forecast.png> <./figures/extreme_events.png>]
+Underfull \hbox (badness 1859) in paragraph at lines 365--366
 []\T1/cmr/bx/n/10.95 Supply-Side Fac-tors. \T1/cmr/m/n/10.95 Ap-prox-i-mately
  []
 
-
-
-<figures/uri_diagnostic.png, id=276, 857.3631pt x 714.9912pt>
+<figures/uri_diagnostic.png, id=272, 857.3631pt x 714.9912pt>
 File: figures/uri_diagnostic.png Graphic file (type png)
 <use figures/uri_diagnostic.png>
-Package pdftex.def Info: figures/uri_diagnostic.png  used on input line 392.
+Package pdftex.def Info: figures/uri_diagnostic.png  used on input line 370.
 (pdftex.def)             Requested size: 229.8775pt x 191.69737pt.
 
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[7 <./figures/extreme_events.png> <./figures/uri_diagnostic.png>]
+
+
+
+
+[7 <./figures/uri_diagnostic.png>]
 File: figures/benchmark_comparison.png Graphic file (type png)
 <use figures/benchmark_comparison.png>
 Package pdftex.def Info: figures/benchmark_comparison.png  used on input line 4
-27.
+05.
 (pdftex.def)             Requested size: 229.8775pt x 113.5811pt.
 
+Underfull \vbox (badness 2027) has occurred while \output is active []
 
 
-Underfull \hbox (badness 3250) in paragraph at lines 464--465
+
+
+Underfull \hbox (badness 3250) in paragraph at lines 442--443
 []\T1/cmr/m/n/10.95 Interestingly, while ex-plicit time fea-tures
  []
 
 
-Underfull \hbox (badness 2564) in paragraph at lines 472--473
+Underfull \hbox (badness 2564) in paragraph at lines 451--452
 \T1/cmr/m/n/10.95 grades sig-nif-i-cantly dur-ing price spikes,
  []
 
 
 
 [8]
-Underfull \hbox (badness 10000) in paragraph at lines 486--487
+Underfull \hbox (badness 10000) in paragraph at lines 465--466
 []\T1/cmr/m/n/10.95 Ensemble meth-ods com-bin-ing mul-ti-ple
  []
 
 
-Underfull \hbox (badness 1087) in paragraph at lines 493--494
+Underfull \hbox (badness 1087) in paragraph at lines 472--473
 \T1/cmr/m/n/10.95 This pa-per demon-strates that ac-cu-rate day-
  []
 
+
+
 (./main.bbl
-
-
 Underfull \hbox (badness 1983) in paragraph at lines 15--20
 []\T1/cmr/m/n/10.95 Electric Re-li-a-bil-ity Coun-cil of Texas.  Er-
  []
@@ -769,12 +761,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 15--20
 )
 
 [9]
-Underfull \hbox (badness 10000) in paragraph at lines 512--513
+Underfull \hbox (badness 10000) in paragraph at lines 491--492
 []\T1/cmr/m/n/10.95 Weather data: Open-Meteo His-tor-i-cal
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 516--517
+Underfull \hbox (badness 10000) in paragraph at lines 495--496
 []\T1/cmr/m/n/10.95 Code repos-i-tory: []$\T1/cmtt/m/n/10.95 https : / / github
  . com /
  []
@@ -794,49 +786,86 @@ L3 programming layer <2025-01-18>
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 2823275820E83388430D02B607203F9B;5486.
+
+Package rerunfilecheck Warning: File `main.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `main.out':
+(rerunfilecheck)             Before: 2823275820E83388430D02B607203F9B;5486
+(rerunfilecheck)             After:  51AC279E723E2306215AF002F07B564D;5325.
  ) 
 Here is how much of TeX's memory you used:
- 13645 strings out of 474662
- 212989 string characters out of 5751110
+ 13649 strings out of 474662
+ 213062 string characters out of 5751110
  624008 words of memory out of 5000000
- 36404 multiletter control sequences out of 15000+600000
- 579824 words of font info for 91 fonts, out of 8000000 for 9000
+ 36403 multiletter control sequences out of 15000+600000
+ 579048 words of font info for 90 fonts, out of 8000000 for 9000
  319 hyphenation exceptions out of 8191
  75i,10n,79p,1081b,526s stack positions out of 10000i,1000n,20000p,200000b,200000s
- </Users/graydonsnider/Library/texlive/2025basic/texmf-var/fonts/pk/ljfour/jk
-nappen/ec/ectt1095.600pk> </Users/graydonsnider/Library/texlive/2025basic/texmf
--var/fonts/pk/ljfour/jknappen/ec/ecti1095.600pk> </Users/graydonsnider/Library/
-texlive/2025basic/texmf-var/fonts/pk/ljfour/jknappen/ec/tcbx1095.600pk> </Users
-/graydonsnider/Library/texlive/2025basic/texmf-var/fonts/pk/ljfour/jknappen/ec/
-ecbx1000.600pk> </Users/graydonsnider/Library/texlive/2025basic/texmf-var/fonts
-/pk/ljfour/jknappen/ec/ecrm0900.600pk> </Users/graydonsnider/Library/texlive/20
-25basic/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm0800.600pk> </Users/graydonsn
-ider/Library/texlive/2025basic/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1200.6
-00pk> </Users/graydonsnider/Library/texlive/2025basic/texmf-var/fonts/pk/ljfour
-/jknappen/ec/tcrm1095.600pk> </Users/graydonsnider/Library/texlive/2025basic/te
-xmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1095.600pk> </Users/graydonsnider/Libra
-ry/texlive/2025basic/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1095.600pk> </Us
-ers/graydonsnider/Library/texlive/2025basic/texmf-var/fonts/pk/ljfour/jknappen/
-ec/ecbx1440.600pk> </Users/graydonsnider/Library/texlive/2025basic/texmf-var/fo
-nts/pk/ljfour/jknappen/ec/ectt1000.600pk> </Users/graydonsnider/Library/texlive
-/2025basic/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1000.600pk> </Users/graydo
-nsnider/Library/texlive/2025basic/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm120
-0.600pk> </Users/graydonsnider/Library/texlive/2025basic/texmf-var/fonts/pk/ljf
-our/jknappen/ec/ecrm1728.600pk></usr/local/texlive/2025basic/texmf-dist/fonts/t
-ype1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2025basic/texmf-dist/fon
-ts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2025basic/texmf-dist
-/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2025basic/texmf-
-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2025basic/tex
-mf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2025basic/
-texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2025basi
-c/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2025
-basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb>
-Output written on main.pdf (10 pages, 2254227 bytes).
+
+pdfTeX warning (dest): name{table.caption.16} has been referenced but does not 
+exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{table.caption.14} has been referenced but does not 
+exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{figure.caption.13} has been referenced but does not
+ exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{table.caption.10} has been referenced but does not 
+exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{figure.caption.9} has been referenced but does not 
+exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{table.caption.6} has been referenced but does not e
+xist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsection.4.9} has been referenced but does not ex
+ist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsubsection.4.8.1} has been referenced but does n
+ot exist, replaced by a fixed one
+
+ </Users/graydonsnider/Library/texlive/2025basic/texmf-var/fonts/pk/ljfour/jkna
+ppen/ec/ectt1095.600pk> </Users/graydonsnider/Library/texlive/2025basic/texmf-v
+ar/fonts/pk/ljfour/jknappen/ec/ecti1095.600pk> </Users/graydonsnider/Library/te
+xlive/2025basic/texmf-var/fonts/pk/ljfour/jknappen/ec/tcbx1095.600pk> </Users/g
+raydonsnider/Library/texlive/2025basic/texmf-var/fonts/pk/ljfour/jknappen/ec/ec
+rm0900.600pk> </Users/graydonsnider/Library/texlive/2025basic/texmf-var/fonts/p
+k/ljfour/jknappen/ec/ecrm0800.600pk> </Users/graydonsnider/Library/texlive/2025
+basic/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1200.600pk> </Users/graydonsnid
+er/Library/texlive/2025basic/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1095.600
+pk> </Users/graydonsnider/Library/texlive/2025basic/texmf-var/fonts/pk/ljfour/j
+knappen/ec/ecbx1095.600pk> </Users/graydonsnider/Library/texlive/2025basic/texm
+f-var/fonts/pk/ljfour/jknappen/ec/ecrm1095.600pk> </Users/graydonsnider/Library
+/texlive/2025basic/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1440.600pk> </User
+s/graydonsnider/Library/texlive/2025basic/texmf-var/fonts/pk/ljfour/jknappen/ec
+/ectt1000.600pk> </Users/graydonsnider/Library/texlive/2025basic/texmf-var/font
+s/pk/ljfour/jknappen/ec/ecrm1000.600pk> </Users/graydonsnider/Library/texlive/2
+025basic/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1200.600pk> </Users/graydons
+nider/Library/texlive/2025basic/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1728.
+600pk></usr/local/texlive/2025basic/texmf-dist/fonts/type1/public/amsfonts/cm/c
+mbx10.pfb></usr/local/texlive/2025basic/texmf-dist/fonts/type1/public/amsfonts/
+cm/cmex10.pfb></usr/local/texlive/2025basic/texmf-dist/fonts/type1/public/amsfo
+nts/cm/cmmi10.pfb></usr/local/texlive/2025basic/texmf-dist/fonts/type1/public/a
+msfonts/cm/cmmi8.pfb></usr/local/texlive/2025basic/texmf-dist/fonts/type1/publi
+c/amsfonts/cm/cmr10.pfb></usr/local/texlive/2025basic/texmf-dist/fonts/type1/pu
+blic/amsfonts/cm/cmr8.pfb></usr/local/texlive/2025basic/texmf-dist/fonts/type1/
+public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2025basic/texmf-dist/fonts/ty
+pe1/public/amsfonts/cm/cmsy8.pfb>
+Output written on main.pdf (10 pages, 2244117 bytes).
 PDF statistics:
- 877 PDF objects out of 1000 (max. 8388607)
- 378 compressed objects within 4 object streams
- 101 named destinations out of 1000 (max. 500000)
+ 847 PDF objects out of 1000 (max. 8388607)
+ 377 compressed objects within 4 object streams
+ 107 named destinations out of 1000 (max. 500000)
  313 words of extra memory for PDF output out of 10000 (max. 10000000)
 

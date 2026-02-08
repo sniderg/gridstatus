@@ -224,29 +224,7 @@ This approach simulates realistic operational deployment where the model is retr
 
 \section{Results}
 
-\subsection{Benchmark Comparison}
 
-We compare our LightGBM model against naive baselines using the Mean Absolute Scaled Error (MASE), a scale-independent metric proposed by \citet{hyndman2006another}:
-\begin{equation}
-    \text{MASE} = \frac{\text{MAE}_{\text{forecast}}}{\text{MAE}_{\text{naive}}} = \frac{\frac{1}{H}\sum_{t=1}^{H}|y_t - \hat{y}_t|}{\frac{1}{T-m}\sum_{t=m+1}^{T}|y_t - y_{t-m}|}
-\end{equation}
-where $H$ is the forecast horizon, $T$ is the training set size, and $m=24$ is the seasonal period (hourly day-ahead). MASE $< 1$ indicates the model outperforms the seasonal naive baseline; MASE $= 0.5$ means errors are 50\% smaller than naive. Table~\ref{tab:benchmark} and Figure~\ref{fig:benchmark} summarize 2025 test set performance.
-
-\begin{table}[H]
-    \centering
-    \caption{Benchmark Comparison (2025 Test Set)}
-    \label{tab:benchmark}
-    \small
-    \begin{tabular}{lcc}
-        \toprule
-        Model & MAE & MASE \\
-        \midrule
-        \textbf{LightGBM} & \textbf{\$9.46} & \textbf{0.813} \\
-        Naive (24h) & \$11.61 & 1.000 \\
-        Seasonal (168h) & \$14.16 & 1.218 \\
-        \bottomrule
-    \end{tabular}
-\end{table}
 
 \begin{figure}[H]
     \centering
@@ -467,6 +445,7 @@ Interestingly, while explicit time features (hour-of-day, day-of-week) rank low 
 
 Several limitations merit consideration:
 \begin{enumerate}
+    \item \textbf{4CP Prediction}: Industrial users reduce load during the four highest system peaks (4CP) to lower transmission charges. Our analysis shows a divergence between price peaks (20:00--23:00, driven by solar ramp-down) and system load peaks (16:00--18:00). Future work should model system load explicitly to support 4CP avoidance strategies.
     \item \textbf{Single pricing hub}: Results may differ for other ERCOT hubs (HB\_SOUTH, HB\_HOUSTON, HB\_WEST)
     \item \textbf{Weather station}: Using a single location as proxy for the zone introduces spatial aggregation error
     \item \textbf{Extreme events}: Model performance degrades significantly during price spikes, which are of greatest interest to risk managers
