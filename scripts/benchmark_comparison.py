@@ -50,6 +50,10 @@ def load_data():
             gas.index = pd.to_datetime(gas.index)
         
         # Merge gas prices
+        # IMPORTANT: Shift gas prices by 1 day to prevent data leakage.
+        # We are forecasting Day D prices on Day D-1. We only know Day D-1 gas close.
+        gas['gas_price'] = gas['gas_price'].shift(1)
+        
         prices = prices.merge(gas, left_on='date', right_index=True, how='left')
         
         # Forward fill any missing gas prices (e.g. recent days not yet in file)
@@ -57,7 +61,7 @@ def load_data():
         
         # Add gas_price to features
         feature_cols = ['temp', 'humidity', 'wind_speed', 'wind_gusts', 'solar_radiation', 'cloud_cover', 'gas_price']
-        print(f"Loaded gas prices. Range: {gas.index.min()} to {gas.index.max()}")
+        print(f"Loaded gas prices (lagged 1 day). Range: {gas.index.min()} to {gas.index.max()}")
         
     except Exception as e:
         print(f"Warning: Could not load gas prices: {e}")
