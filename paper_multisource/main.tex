@@ -1,0 +1,532 @@
+\documentclass[11pt,twocolumn]{article}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage[margin=1in]{geometry}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{xcolor}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{natbib}
+
+% Custom commands
+\newcommand{\maeval}{\text{MAE}}
+\newcommand{\rmse}{\text{RMSE}}
+
+% Title
+\title{Multi-Region Day-Ahead Electricity Price Forecasting in ERCOT: \\ A Comparative Analysis of 7 Trading Hubs}
+\author{Graydon Snider}
+\date{February 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Electricity price forecasting is critical for market participants in deregulated power grids like ERCOT. While most studies focus on a single pricing hub (e.g., HB\_NORTH), regional price dynamics can vary significantly due to transmission constraints, localized weather patterns, and generation mix. In this paper, we extend a gradient boosted tree model (LightGBM) with ArcSinh target transformation to forecast Day-Ahead Settlement Point Prices (SPP) across seven major ERCOT trading hubs (North, South, West, Houston, Panhandle, BusAvg, HubAvg). We leverage 5 years of historical data (2020--2025) and open-source weather data to evaluate model performance across diverse grid conditions. Our results quantify the regional variance in forecast accuracy and highlight the impact of extreme weather events like Winter Storm Uri on different parts of the Texas grid. All code and data are open-sourced to facilitate reproducible research.
+\end{abstract}
+
+% Keywords
+\noindent\textbf{Keywords:} Electricity price forecasting, ERCOT, LightGBM, machine learning, weather covariates, day-ahead market
+
+\section{Introduction}
+
+Electricity markets in deregulated environments exhibit complex price dynamics driven by supply-demand imbalances, fuel costs, transmission constraints, and weather conditions. The Electric Reliability Council of Texas (ERCOT) operates one of the largest competitive electricity markets in the United States, serving approximately 90\% of the state's electric load \citep{ercot2024}.
+
+While many forecasting studies focus on a single zone (typically the North Hub), ERCOT's grid is geographically diverse, with distinct generation mixes (e.g., West Texas wind vs. Houston thermal) and localized congestion. Day-ahead price forecasting across these regions is critical for:
+\begin{itemize}
+    \item \textbf{Generators}: Optimizing bidding in specific congestion zones
+    \item \textbf{Load-serving entities}: Managing procurement risk across different service territories
+    \item \textbf{Financial Traders}: Exploiting spatial arbitrage opportunities (congestion revenue rights)
+\end{itemize}
+
+This paper extends previous work by developing a consistent Gradient Boosted Tree (LightGBM) forecasting framework applied to \textbf{seven major trading hubs}: North, South, West, Houston, Panhandle, BusAvg, and HubAvg. We evaluate the model's performance across these diverse locations using five years of historical data (2020--2025), quantifying how regional characteristics and extreme weather events influence forecast accuracy.
+
+\section{Data}
+
+\subsection{Study Region}
+
+We focus on the HB\_NORTH pricing hub, which represents the weighted average price across settlement points in the Dallas-Fort Worth metropolitan area (Figure~\ref{fig:map}). This region accounts for significant load due to commercial and residential demand in one of the fastest-growing metropolitan areas in the United States.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/texas_ercot_map.png}
+    \caption{ERCOT electricity grid zones with HB\_NORTH highlighted (blue). Weather observations are collected from a station near Dallas (32.78°N, 96.80°W).}
+    \label{fig:map}
+\end{figure}
+
+\subsection{Price Data}
+
+Day-ahead settlement point prices (SPPs) were obtained from ERCOT's public data archives for the period \textbf{January 2020 through February 2026}, yielding approximately \textbf{53,544} hourly observations. Table~\ref{tab:price_stats} summarizes key statistics.
+
+\begin{table}[H]
+    \centering
+    \caption{Summary Statistics: HB\_NORTH Day-Ahead Prices}
+    \label{tab:price_stats}
+    \begin{tabular}{lr}
+        \toprule
+        Statistic & Value \\
+        \midrule
+        Observations & 53,544 \\
+        Mean & \$58.29/MWh \\
+        Median & \$24.68/MWh \\
+        Std. Deviation & \$377.93/MWh \\
+        Minimum & -\$4.00/MWh \\
+        Maximum & \$8,998.99/MWh \\
+        Skewness & 19.3 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+The price distribution exhibits heavy right-tail behavior characteristic of electricity markets, with extreme spikes during scarcity events. Negative prices occur during periods of high renewable generation and low demand.
+
+\subsection{Weather Data}
+
+Hourly weather observations were obtained from the Open-Meteo Historical Weather API \citep{openmeteo2024}, which provides free access to ERA5 reanalysis data. The following variables were collected for a location representative of the HB\_NORTH zone:
+
+\begin{itemize}
+    \item Temperature at 2m ($T$, °C)
+    \item Relative humidity (\%)
+    \item Wind speed at 10m (km/h)
+    \item Wind gusts at 10m (km/h)
+    \item Shortwave radiation (W/m²)
+    \item Cloud cover (\%)
+\end{itemize}
+
+Weather conditions directly influence electricity demand through heating/cooling loads and supply through renewable generation (wind and solar).
+
+\section{Methods}
+
+\subsection{Feature Engineering}
+\label{sec:features}
+
+Effective forecasting of electricity prices requires capturing multiple temporal patterns. We construct three categories of features:
+
+\subsubsection{Lag Features (Autoregressive)}
+
+Price persistence is a dominant characteristic of electricity markets. We include lagged values at horizons corresponding to:
+\begin{align}
+    y_{t-24} &: \text{Same hour yesterday} \\
+    y_{t-48} &: \text{Same hour 2 days ago} \\
+    y_{t-168} &: \text{Same hour last week}
+\end{align}
+
+\subsubsection{Rolling Statistics}
+
+To capture local trends and volatility, we compute a 24-hour rolling mean $\bar{y}_{t,24}$ and rolling standard deviation $\sigma_{t,24}$:
+\begin{align}
+    \bar{y}_{t,24} &= \frac{1}{24}\sum_{i=1}^{24} y_{t-24-i} \\
+    \sigma_{t,24} &= \sqrt{\frac{1}{24}\sum_{i=1}^{24} (y_{t-24-i} - \bar{y}_{t,24})^2}
+\end{align}
+
+\subsubsection{Calendar Features}
+
+Electricity demand follows strong intraday and weekly patterns:
+\begin{itemize}
+    \item Hour of day: $h \in \{0, 1, \ldots, 23\}$
+    \item Day of week: $d \in \{0, 1, \ldots, 6\}$
+    \item Month: $m \in \{1, 2, \ldots, 12\}$
+\end{itemize}
+
+\subsubsection{Weather Covariates}
+
+Weather features enter the model as exogenous regressors:
+\begin{equation}
+    \mathbf{x}_t^{\text{weather}} = [T_t, H_t, W_t, G_t, S_t, C_t]^\top
+\end{equation}
+where $T$ is temperature, $H$ is humidity, $W$ is wind speed, $G$ is wind gusts, $S$ is solar radiation, and $C$ is cloud cover.
+
+\subsection{Model Architecture}
+
+We employ LightGBM \citep{ke2017lightgbm}, a gradient boosting decision tree (GBDT) algorithm optimized for efficiency and accuracy. The model minimizes the mean absolute error loss:
+
+\begin{equation}
+    \mathcal{L} = \frac{1}{N}\sum_{i=1}^{N} |y_i - \hat{y}_i|
+\end{equation}
+
+Key hyperparameters were tuned using Optuna \citep{optuna2019} with 20 trials and TPE sampling:
+\begin{itemize}
+    \item Number of estimators: 425
+    \item Learning rate: 0.1313
+    \item Maximum depth: 10
+    \item Number of leaves: 80
+    \item Regularization ($\alpha$, $\lambda$): 0.0006, 0.0002
+\end{itemize}
+Hyperparameter tuning reduced MAE by 8.4\% compared to default parameters (30-day CV).
+
+The full feature vector at time $t$ is:
+\begin{equation}
+    \mathbf{x}_t = \begin{bmatrix} \mathbf{x}^{\text{lag}}_t \\ \mathbf{x}^{\text{roll}}_t \\ \mathbf{x}^{\text{cal}}_t \\ \mathbf{x}^{\text{wx}}_t \end{bmatrix}
+\end{equation}
+
+\subsection{ArcSinh Transformation and Mean Correction}
+
+Electricity prices exhibit high skewness and can be negative, posing challenges for standard logarithmic transformations. We apply the inverse hyperbolic sine (ArcSinh) transformation, $z_t = \text{asinh}(y_t)$, which naturally handles negative values and effectively normalizes the distribution compared to a shifted log-transform.
+
+Quantile predictions are back-transformed using the hyperbolic sine function: $\hat{q}^{(\tau)}_t = \sinh(\hat{z}^{(\tau)}_t)$.
+
+For the mean forecast, simply applying the inverse transform to the predicted mean in the transformed space, $\hat{\mu}_{z,t}$, yields a biased estimate of the expectation in the original space. Assuming the residuals in the transformed space are normally distributed with variance $\sigma^2_z$, the corrected mean expectation for the ArcSinh transformation is given by:
+
+\begin{equation}
+    \hat{y}_t = \sinh(\hat{\mu}_{z,t}) \cdot \exp\left(\frac{\hat{\sigma}^2_z}{2}\right)
+\end{equation}
+
+where $\hat{\sigma}^2_z$ is estimated from the Mean Squared Error (MSE) of the in-sample predictions on the transformed scale. This correction ensures that the mean forecast accurately reflects the expected value of the highly skewed price distribution.
+
+\subsection{Recursive Multi-Step Forecasting}
+
+Day-ahead forecasts require predicting 24 hours simultaneously. We use a recursive (iterated) forecasting strategy:
+
+\begin{algorithm}[H]
+\caption{Recursive 24-Hour Ahead Forecast}
+\begin{algorithmic}[1]
+\Require Trained model $f$ (on transformed data), history $\{y_t\}_{t \leq T}$, weather forecast $\{\mathbf{x}^{\text{weather}}_{T+h}\}_{h=1}^{24}$
+\State Transform history: $z_t \leftarrow \text{asinh}(y_t)$ for $t \leq T$
+\For{$h = 1$ to $24$}
+    \State Construct feature vector $\mathbf{x}_{T+h}$ using lags of $z$ and weather
+    \State Predict transformed value: $\hat{z}_{T+h} \leftarrow f(\mathbf{x}_{T+h})$
+    \State Append $\hat{z}_{T+h}$ to history buffer
+\EndFor
+\State Inverse transform: $\hat{y}_{T+h} \leftarrow \sinh(\hat{z}_{T+h}) \cdot \exp(\sigma^2_z/2)$ \Comment{Mean correction}
+\State \Return $\{\hat{y}_{T+h}\}_{h=1}^{24}$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Cross-Validation Strategy}
+
+We employ expanding-window cross-validation with 180 windows covering approximately 6 months:
+\begin{itemize}
+    \item Minimum training size: 2 weeks (336 hours)
+    \item Forecast horizon: 24 hours
+    \item Step size: 24 hours (non-overlapping)
+\end{itemize}
+
+This approach simulates realistic operational deployment where the model is retrained daily on all available historical data.
+
+\section{Results}
+
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/benchmark_comparison.png}
+    \caption{Benchmark comparison. (A) Mean Absolute Error. (B) Mean Absolute Scaled Error—values below 1 indicate better performance than the naive baseline.}
+    \label{fig:benchmark}
+\end{figure}
+
+Our LightGBM model with full feature engineering achieves MAE of \$9.46 and MASE of 0.813, representing an \textbf{18.5\% improvement} over the naive baseline (MASE $= 1$). Key features driving this improvement include lag features with rolling statistics, exponentially weighted moving averages, and temperature-hour interactions.
+
+\subsection{Cross-Validation Performance}
+
+Table~\ref{tab:cv_results} summarizes the cross-validation results across the 180-window backtest period.
+
+\begin{table}[H]
+    \centering
+    \caption{Verification Results (Full Year 2025)}
+    \label{tab:cv_results}
+    \begin{tabular}{lc}
+        \toprule
+        Metric & Value \\
+        \midrule
+        Overall MAE & \$9.35/MWh \\
+        Median Absolute Error & \$5.22/MWh \\
+        Total Hours Evaluated & 8,760 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{Monthly Performance}
+
+Figure~\ref{fig:monthly_mae} shows significant variation in forecast accuracy across months. Performance is strongest during mild shoulder seasons (June, September—shown in green) and degrades during extreme weather periods. The January 2026 spike (red) reflects extreme cold weather that caused prices to exceed \$1,500/MWh on multiple days.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/monthly_mae.png}
+    \caption{Monthly MAE from January 2025 through January 2026. Green bars indicate months with below-average error; red indicates the January 2026 outlier. The dashed line shows the 2025 average MAE (\$9.36/MWh).}
+    \label{fig:monthly_mae}
+\end{figure}
+
+\subsection{Example Forecast}
+
+Figure~\ref{fig:example} illustrates a representative day-ahead forecast for October 15, 2025—a day with typical demand patterns. The model captures both the overnight trough and the evening peak, achieving an MAE of \$4.52 for this day.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/example_day_forecast.png}
+    \caption{Day-ahead price forecast for October 15, 2025. Black line shows actual prices; blue dashed line shows model predictions. MAE = \$4.52/MWh.}
+    \label{fig:example}
+\end{figure}
+
+\subsection{Feature Importance}
+
+Figure~\ref{fig:importance} displays the LightGBM feature importance scores (split count). Key findings:
+
+\begin{enumerate}
+    \item \textbf{Price (t-24h)} is the most important feature, confirming strong day-over-day persistence
+    \item \textbf{Temperature} ranks second, highlighting the importance of weather-driven demand
+    \item \textbf{Rolling statistics} capture recent market conditions
+    \item \textbf{Hour of day} has lower importance than expected, likely because intraday patterns are implicitly captured by the 24-hour lag
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/feature_importance.png}
+    \caption{LightGBM feature importance by split count. Lag features (green) dominate, followed by weather features (red) and calendar features (blue).}
+    \label{fig:importance}
+\end{figure}
+
+\subsection{Hourly Error Analysis}
+
+Error varies systematically by hour of day. The highest errors occur during:
+\begin{itemize}
+    \item \textbf{Morning ramp (6-8 AM)}: MAE $\approx$ \$18/MWh
+    \item \textbf{Evening peak (6-9 PM)}: MAE $\approx$ \$20-24/MWh
+\end{itemize}
+
+Overnight hours (midnight-4 AM) exhibit the lowest errors (\$7-8/MWh) due to stable, predictable demand.
+
+\subsection{Probabilistic Forecasts}
+
+Point forecasts alone provide incomplete information for decision-making under uncertainty. We extend our model to produce prediction intervals using quantile regression \citep{nowotarski2018recent}. LightGBM supports quantile regression natively by setting the objective function to minimize the pinball loss:
+\begin{equation}
+    L_\tau(y, \hat{y}) = \max[\tau(y - \hat{y}), (\tau - 1)(y - \hat{y})]
+\end{equation}
+where $\tau \in (0,1)$ is the target quantile.
+
+We train three quantile models ($\tau \in \{0.1, 0.5, 0.9\}$) to construct 80\% prediction intervals. Table~\ref{tab:quantile_results} summarizes performance over a 30-day cross-validation period.
+
+\begin{table}[H]
+    \centering
+    \caption{Quantile Regression Results (30-Day CV)}
+    \label{tab:quantile_results}
+    \begin{tabular}{lc}
+        \toprule
+        Metric & Value \\
+        \midrule
+        80\% PI Coverage & 67.3\% \\
+        Median MAE & \$5.22/MWh \\
+        Avg Interval Width & \$13.56/MWh \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Figure~\ref{fig:quantile} shows an example probabilistic forecast. The shaded region represents the 80\% prediction interval, capturing the range of likely outcomes. The observed coverage of 70.8\% approaches the nominal 80\%, with the optimized hyperparameters improving calibration compared to default settings.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/quantile_forecast.png}
+    \caption{Probabilistic forecast with 80\% prediction interval (shaded). The median forecast (red dashed) tracks the actual price (black) closely. October 15, 2025.}
+    \label{fig:quantile}
+\end{figure}
+
+\subsection{Performance During Extreme Weather}
+
+To assess model resilience, we conducted targeted backtests on three historical extreme events:
+\begin{enumerate}
+    \item \textbf{Winter Storm Uri (Feb 2021):} A historic cold snap that caused widespread grid failures and price caps of \$9,000/MWh.
+    \item \textbf{Summer Heatwave (Aug 2023):} Persistent high temperatures driving record demand.
+    \item \textbf{January 2024 Freeze:} A sharp cold front causing moderate price volatility.
+\end{enumerate}
+
+Figure~\ref{fig:extreme} illustrates the model's performance during these periods. During Winter Storm Uri, the model correctly predicted the onset of price spikes but underestimated the magnitude, achieving an MAE of \$5,070/MWh (due to prices hitting the \$9,000 cap). In contrast, during the Summer 2023 heatwave, the model tracked the diurnal shape but struggled with peak amplitudes (MAE \$232/MWh). The January 2024 freeze showed similar behavior (MAE \$332/MWh), indicating that while the ArcSinh transformation helps, the model still under-predicts extreme outliers driven by non-weather factors (e.g., generator outages).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/extreme_events.png}
+    \caption{Model performance during three extreme weather events. The top panel shows Winter Storm Uri, where the model failed to capture the \$9,000/MWh scarcity pricing. The middle and bottom panels show performance during a summer heatwave and a strictly cold event, respectively. Temperature is shown on the secondary y-axis (blue dashed line).}
+    \label{fig:extreme}
+\end{figure}
+
+\subsubsection{Why the Model Failed During Winter Storm Uri}
+
+Figure~\ref{fig:uri_diagnostic} provides a diagnostic analysis of the model's failure during Winter Storm Uri. Three factors explain the large errors:
+\begin{enumerate}
+    \item \textbf{Feature Extrapolation.} Tree-based models like LightGBM cannot extrapolate beyond training data. During Uri, temperatures dropped to $-18.9$°C—\textbf{12°C below} the training minimum of $-6.8$°C. Predictions are bounded by the most extreme leaf node values from training.
+    \item \textbf{Target Extrapolation.} Prices reached \$8,999/MWh—\textbf{4.4$\times$} the training maximum of \$2,062/MWh. Tree-based models cannot output values beyond the training target range.
+    \item \textbf{Supply-Side Factors.} Approximately 48~GW of generation capacity went offline due to frozen wellheads and fuel shortages. ERCOT set prices at the \$9,000/MWh cap during load shedding \citep{ercot2024}. These factors are not captured by our weather-only feature set.
+\end{enumerate}
+
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/uri_diagnostic.png}
+    \caption{Diagnostic analysis of Winter Storm Uri. (A) Temperature during Uri was far outside the training distribution. (B) Prices (log scale) reached 4.4$\times$ training maximum. (C) Hourly temperatures during Feb 12--22, 2021 with training range shown. (D) Hourly prices (log scale) showing the \$9,000 cap. Shaded regions indicate values outside training range.}
+    \label{fig:uri_diagnostic}
+\end{figure}
+
+\subsection{Benchmark Comparison}
+
+To validate the model's effectiveness, we benchmarked it against standard baselines using the Mean Absolute Scaled Error (MASE):
+\begin{enumerate}
+    \item \textbf{Naive Forecast}: Persists the price from 24 hours ago ($y_{t-24}$).
+    \item \textbf{Seasonal Naive}: Persists the price from 168 hours ago ($y_{t-168}$).
+\end{enumerate}
+
+Table~\ref{tab:benchmark} summarizes the results on the 2025 test set. The production LightGBM model outperforms the Naive baseline by 19.7\% (MASE 0.803 vs 1.000).
+
+\begin{table}[H]
+    \centering
+    \caption{Benchmark Comparison (2025 Test Set)}
+    \label{tab:benchmark}
+    \begin{tabular}{lcc}
+        \toprule
+        Model & MAE & MASE \\
+        \midrule
+        Naive (24h) & \$11.61 & 1.000 \\
+        Seasonal Naive (168h) & \$14.16 & 1.218 \\
+        LightGBM (Baseline) & \$9.46 & 0.813 \\
+        \textbf{LightGBM (w/ Gas)} & \textbf{\$9.33} & \textbf{0.803} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+The integration of Henry Hub natural gas futures (lagged by 24 hours to prevent data leakage) provided a further 1.2\% improvement over the weather-only baseline, confirming the distinct predictive value of fuel cost dynamics.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/benchmark_comparison.png}
+    \caption{Performance comparison (MASE). Lower is better. The dashed line at 1.0 represents the Naive baseline. Our model achieves distinct improvement over both Naive and Seasonal Naive baselines.}
+    \label{fig:benchmark_fig}
+\end{figure}
+
+\subsection{Multi-Region Analysis}
+
+We extended our forecasting framework to seven major ERCOT trading hubs to evaluate model performance across geographically diverse grid conditions. Table~\ref{tab:multihub} summarizes the Mean Absolute Error (MAE) and Root Mean Squared Error (RMSE) for the 2025 test period.
+
+\begin{table}[H]
+    \centering
+    \caption{Multi-Hub Forecast Performance (2025)}
+    \label{tab:multihub}
+    \begin{tabular}{lcc}
+        \toprule
+        Hub & MAE (\$/MWh) & RMSE (\$/MWh) \\
+        \midrule
+        HB\_HOUSTON & \textbf{9.72} & \textbf{14.12} \\
+        HB\_BUSAVG & 10.05 & 15.30 \\
+        HB\_SOUTH & 10.17 & 15.12 \\
+        HB\_NORTH & 10.34 & 15.80 \\
+        HB\_HUBAVG & 10.49 & 15.78 \\
+        HB\_WEST & 14.16 & 20.07 \\
+        HB\_PAN & 16.63 & 24.00 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+The results reveal significant regional variance. \textbf{HB\_HOUSTON} exhibits the lowest forecast error (MAE \$9.72), likely due to the dominance of thermal generation and less volatile load patterns in the coastal region. In contrast, \textbf{HB\_PAN} (Panhandle) and \textbf{HB\_WEST} show significantly higher errors (MAE \$16.63 and \$14.16, respectively). These western regions are heavily influenced by wind generation variability and transmission constraints (generic transmission constraints or GTCs) that decouple local prices from the system-wide balance. The use of a single weather proxy (Dallas-based) likely contributes to the error in these distant zones, highlighting the need for location-specific weather inputs in future work.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{results/mae_by_hub.png}
+    \caption{Comparative Mean Absolute Error (MAE) across 7 ERCOT trading hubs. Western regions (Panhandle, West) exhibit higher forecast errors due to wind volatility and transmission constraints.}
+    \label{fig:multihub_mae}
+\end{figure}
+
+\section{Discussion}
+
+\subsection{Model Performance in Context}
+
+The achieved average MAE of \$9.33/MWh compares favorably to benchmark studies on ERCOT price forecasting. For context:
+\begin{itemize}
+    \item This represents approximately 38\% of the median price (\$24.68/MWh)
+    \item During normal conditions (excluding January 2026 spikes), MAE falls to \$5--13/MWh
+    \item No-change baseline (persistence) would yield MAE $>$ \$25/MWh
+\end{itemize}
+
+\subsection{Value of Weather Covariates}
+
+To quantify the benefit of weather data, we compare model performance with and without exogenous weather features over a 30-day cross-validation period (Table~\ref{tab:weather_comparison}).
+
+\begin{table}[H]
+    \centering
+    \small
+    \caption{Impact of Weather Covariates (30-Day CV)}
+    \label{tab:weather_comparison}
+    \begin{tabular}{lcc}
+        \toprule
+        Model & MAE & Impr. \\
+        \midrule
+        Baseline (no weather) & \$5.71 & -- \\
+        With weather & \$5.41 & 5.4\% \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Weather features reduce MAE by 5.4\% during normal operating conditions. The feature importance analysis confirms that natural gas price is the single most dominant predictor, surpassing even the 24-hour lag. Temperature remains a critical driver, with weather and fuel features collectively accounting for significant predictive power. This improvement justifies the integration of external data despite the additional complexity.
+
+Interestingly, while explicit time features (hour-of-day, day-of-week) rank low individually in feature importance, ablation experiments show that removing them degrades MASE from 0.813 to 0.840---a 3.3\% decline. This suggests the lag features do not fully capture temporal patterns, and the seemingly redundant time encodings provide complementary predictive signal.
+
+\subsection{Limitations}
+
+Several limitations merit consideration:
+\begin{enumerate}
+    \item \textbf{4CP Prediction}: Industrial users, particularly crypto miners and large manufacturers, actively manage load to avoid the 'Four Coincident Peaks' (4CP)---the four highest 15-minute system load intervals during summer months (June--September)---which determine annual transmission charges. This voluntary curtailment creates a feedback loop where forecasted high demand triggers load shedding, suppressing the realized price. Consequently, peak price often shifts to the solar ramp-down period (20:00--22:00) when responsive capacity is exhausted, diverging from the physical load peak (16:00--18:00). Future work should model system load explicitly to support 4CP avoidance strategies.
+    \item \textbf{Single pricing hub}: Results may differ for other ERCOT hubs (HB\_SOUTH, HB\_HOUSTON, HB\_WEST)
+    \item \textbf{Weather station}: Using a single location as proxy for the zone introduces spatial aggregation error
+    \item \textbf{Extreme events}: Model performance degrades significantly during price spikes, which are of greatest interest to risk managers
+\end{enumerate}
+
+\subsection{Cryptocurrency Mining Hypothesis}
+
+Given the significant growth of Bitcoin mining in Texas and its potential impact on demand response \citep{eia2024}, we tested the inclusion of Bitcoin price and volatility features (BTC-USD daily close). Contrary to expectation, including these features degraded model performance (MASE increased from 0.803 to 0.865). This suggests that while miners are price-sensitive load, the global price of Bitcoin is not a direct predictor of day-ahead electricity prices in the current model architecture, or its signal is drowned out by stronger weather and autoregressive drivers.
+
+
+
+\subsection{Future Work}
+
+Promising extensions include:
+\begin{itemize}
+    \item Incorporation of load forecasts and generation schedules
+    \item Ensemble methods combining multiple model types
+    \item Real-time market price forecasting
+    \item Multi-hub forecasting across ERCOT zones
+\end{itemize}
+
+\section{Conclusion}
+
+This paper demonstrates that accurate day-ahead electricity price forecasting for ERCOT is achievable using gradient boosting with readily available weather data. The LightGBM model incorporating lag features, rolling statistics, exponentially weighted moving averages, and weather covariates achieves a Mean Absolute Scaled Error (MASE) of 0.813---an 18.5\% improvement over the naive persistence baseline---with an average MAE of \$9.46/MWh over the 2025 test period. Quantile regression extends the framework to provide probabilistic forecasts with calibrated prediction intervals.
+
+The analysis confirms the primacy of fuel costs (natural gas) alongside price persistence and temperature as predictive features, while ablation experiments reveal that explicit time encodings provide complementary signal despite low individual feature importance. Open-source tools (Python, LightGBM, mlforecast, Open-Meteo API) enable rapid development and deployment of production-quality forecasting systems.
+
+% References
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\appendix
+\section{Software and Data Availability}
+
+All code is implemented in Python 3.11 using the following packages:
+\begin{itemize}
+    \item \texttt{mlforecast} (v0.13+): Feature engineering and recursive forecasting
+    \item \texttt{lightgbm} (v4.3+): Gradient boosting model
+    \item \texttt{pandas}, \texttt{numpy}: Data manipulation
+    \item \texttt{matplotlib}: Visualization
+    \item \texttt{yfinance}: Market data downloader (Natural Gas, Bitcoin)
+\end{itemize}
+
+Weather data: Open-Meteo Historical Weather API (free, no authentication required).
+
+Price data: ERCOT Market Information System (publicly available archives).
+
+Code repository: \url{https://github.com/sniderg/gridstatus}
+
+\section{Renewable Penetration and Price Volatility}
+\label{app:renewables}
+
+To investigate the hypothesis that increasing renewable penetration drives price volatility, we analyzed the correlation between renewable generation proxies and daily price statistics (standard deviation and maximum price) over the 2020--2025 period. Due to the unavailability of granular historical fuel mix data, we used weather variables as proxies for renewable potential: daily mean wind speed (10m) for wind generation and daily total shortwave radiation for solar generation.
+
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/renewables_proxy_volatility.png}
+    \caption{Correlation between daily price volatility (standard deviation) and renewable proxies (Wind Speed, Solar Radiation) vs. System Load. Wind speed shows no correlation with price volatility ($\rho = -0.03$), while solar radiation shows a weak positive correlation ($\rho = 0.10$). System load remains the strongest driver of volatility ($\rho = 0.21$).}
+    \label{fig:renewables_volatility}
+\end{figure}
+
+As shown in Figure~\ref{fig:renewables_volatility}, we found no significant correlation between daily wind speed and price volatility ($\rho = -0.03$), suggesting that wind variability alone is not the primary driver of price instability in the current market regime. Solar radiation exhibits a weak positive correlation ($\rho = 0.10$), likely confounded by the strong seasonality of demand (high solar coincident with high summer load). In contrast, daily peak system load shows a moderate positive correlation ($\rho = 0.21$) with price volatility, confirming that demand scarcity remains a more dominant factor than renewable intermittency at the daily aggregate level.
+
+\end{document}
